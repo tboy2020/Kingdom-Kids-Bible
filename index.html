@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Bible Stories for Children</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,400;0,600;0,700;0,800;0,900;1,400;1,700&family=Fredoka+One&display=swap" rel="stylesheet">
+<style>
+:root {
+  --sky: #1a2a4a;
+  --gold: #f0c040;
+  --gold2: #ffd966;
+  --surface: #1e2e4e;
+  --surface2: #243558;
+  --text: #f8f4e8;
+  --text-dim: rgba(248,244,232,0.7);
+  --border: rgba(255,255,255,0.1);
+  --radius: 20px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; background: var(--sky); color: var(--text); font-family: 'Nunito', sans-serif; overflow: hidden; }
+
+/* ── SPLASH ── */
+#splash {
+  position: fixed; inset: 0; z-index: 100;
+  background: linear-gradient(160deg, #0a1628 0%, #1a2a4a 50%, #0d1e3a 100%);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 14px; padding: 32px; text-align: center;
+}
+.splash-stars { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+.splash-star {
+  position: absolute; background: white; border-radius: 50%;
+  animation: twinkle var(--d) var(--dl) infinite;
+  box-shadow: 0 0 4px rgba(255,255,255,0.8);
+}
+@keyframes twinkle { 0%,100%{opacity:0.1} 50%{opacity:var(--op)} }
+.splash-book { font-size: 4rem; animation: bounce 2s ease-in-out infinite; filter: drop-shadow(0 4px 12px rgba(240,192,64,0.5)); }
+@keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+.splash-title { font-family: 'Fredoka One', cursive; font-size: clamp(1.8rem, 6vw, 2.8rem); color: var(--gold); line-height: 1.2; text-shadow: 0 2px 12px rgba(240,192,64,0.4); }
+.splash-sub { font-size: 1rem; color: var(--text-dim); font-weight: 600; }
+.splash-verse { font-size: 0.9rem; color: rgba(240,192,64,0.8); font-style: italic; max-width: 320px; line-height: 1.6; }
+.splash-btn {
+  margin-top: 16px; padding: 16px 40px;
+  background: linear-gradient(135deg, #d4a820, var(--gold), #f0c040);
+  border: none; border-radius: 100px; cursor: pointer;
+  font-family: 'Fredoka One', cursive; font-size: 1.2rem; color: #1a1a1a;
+  box-shadow: 0 4px 20px rgba(240,192,64,0.5); transition: transform 0.2s, box-shadow 0.2s;
+}
+.splash-btn:hover { transform: translateY(-3px); box-shadow: 0 8px 28px rgba(240,192,64,0.6); }
+#splash.fade-out { animation: fadeOut 0.5s forwards; }
+@keyframes fadeOut { to { opacity: 0; pointer-events: none; } }
+
+/* ── MAIN ── */
+#app { height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+.topbar {
+  display: flex; align-items: center; gap: 12px; padding: 12px 16px;
+  background: var(--surface); border-bottom: 1px solid var(--border); flex-shrink: 0;
+}
+.back-btn {
+  width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--border);
+  background: var(--surface2); color: var(--gold); cursor: pointer;
+  display: flex; align-items: center; justify-content: center; font-size: 1rem;
+  transition: all 0.2s; flex-shrink: 0;
+}
+.back-btn:hover { background: rgba(240,192,64,0.2); }
+.topbar-title { font-family: 'Fredoka One', cursive; font-size: 1.1rem; color: var(--gold); flex: 1; }
+.audio-btn {
+  padding: 8px 14px; border-radius: 100px; border: 1px solid var(--border);
+  background: var(--surface2); color: var(--text-dim); cursor: pointer;
+  font-family: 'Nunito', sans-serif; font-size: 0.78rem; font-weight: 700;
+  transition: all 0.2s; white-space: nowrap;
+}
+.audio-btn.playing { background: rgba(240,192,64,0.2); border-color: var(--gold); color: var(--gold); }
+.view { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; scrollbar-width: thin; scrollbar-color: rgba(240,192,64,0.3) transparent; }
+
+/* ── HOME ── */
+.home-header {
+  padding: 20px 16px 8px; text-align: center;
+  font-family: 'Fredoka One', cursive; font-size: 0.85rem;
+  letter-spacing: 0.1em; color: var(--text-dim); text-transform: uppercase;
+}
+.home-header span { color: var(--gold); }
+.parts-list { padding: 8px 16px 24px; display: flex; flex-direction: column; gap: 10px; }
+.part-section { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+.part-header {
+  padding: 14px 18px; cursor: pointer; display: flex; align-items: center; gap: 12px;
+  transition: background 0.2s;
+}
+.part-header:hover { background: var(--surface2); }
+.part-num {
+  width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center;
+  justify-content: center; font-family: 'Fredoka One', cursive; font-size: 0.9rem;
+  background: linear-gradient(135deg, var(--gold), var(--gold2)); color: #1a1a1a;
+  flex-shrink: 0;
+}
+.part-name { font-family: 'Fredoka One', cursive; font-size: 1rem; color: var(--text); flex: 1; }
+.part-count { font-size: 0.72rem; color: var(--text-dim); }
+.part-arrow { color: var(--text-dim); font-size: 0.9rem; transition: transform 0.2s; }
+.part-header.open .part-arrow { transform: rotate(90deg); }
+.story-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; padding: 4px 12px 14px; display: none; }
+.story-grid.open { display: grid; }
+.story-tile {
+  border-radius: 14px; padding: 14px 12px; cursor: pointer;
+  display: flex; flex-direction: column; gap: 6px;
+  transition: transform 0.2s, box-shadow 0.2s;
+  border: 1px solid rgba(255,255,255,0.06); min-height: 90px;
+  position: relative; overflow: hidden;
+}
+.story-tile:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
+.story-tile::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(circle at 80% 15%, rgba(255,255,255,0.06) 0%, transparent 60%);
+  pointer-events: none;
+}
+.tile-emoji { font-size: 1.6rem; }
+.tile-num { font-size: 0.6rem; color: rgba(255,255,255,0.4); font-weight: 700; letter-spacing: 0.1em; }
+.tile-title { font-family: 'Fredoka One', cursive; font-size: 0.8rem; color: rgba(255,255,255,0.92); line-height: 1.3; }
+
+/* ── STORY READER ── */
+#reader { position: fixed; inset: 0; z-index: 50; display: none; flex-direction: column; }
+#reader.active { display: flex; }
+.reader-header {
+  display: flex; align-items: center; gap: 10px; padding: 12px 14px;
+  border-bottom: 1px solid var(--border); flex-shrink: 0;
+}
+.reader-title { font-family: 'Fredoka One', cursive; font-size: 1rem; color: var(--gold); flex: 1; }
+.reader-progress { font-size: 0.7rem; color: var(--text-dim); white-space: nowrap; }
+.reader-close {
+  width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--border);
+  background: var(--surface2); color: var(--text-dim); cursor: pointer;
+  display: flex; align-items: center; justify-content: center; font-size: 0.9rem;
+}
+.reader-close:hover { background: rgba(255,80,80,0.2); color: #ff6060; }
+.reader-body {
+  flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch;
+  display: flex; flex-direction: column;
+}
+.story-image-wrap {
+  width: 100%; aspect-ratio: 4/3; overflow: hidden; position: relative; flex-shrink: 0;
+  background: var(--surface2);
+}
+.story-image-wrap img { width: 100%; height: 100%; object-fit: cover; }
+.story-image-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(to bottom, transparent 50%, rgba(10,18,40,0.8) 100%);
+}
+.story-image-title {
+  position: absolute; bottom: 14px; left: 16px; right: 16px;
+  font-family: 'Fredoka One', cursive; font-size: clamp(1.2rem, 4vw, 1.8rem);
+  color: white; text-shadow: 0 2px 8px rgba(0,0,0,0.8); line-height: 1.2;
+}
+.story-image-emoji {
+  position: absolute; top: 12px; right: 14px; font-size: 2rem;
+}
+.story-content { padding: 20px 18px 16px; }
+.story-ref-badge {
+  display: inline-block; margin-bottom: 14px;
+  padding: 5px 14px; border-radius: 100px;
+  background: rgba(240,192,64,0.12); border: 1px solid rgba(240,192,64,0.3);
+  font-family: 'Nunito', sans-serif; font-size: 0.72rem; font-weight: 700;
+  color: var(--gold); letter-spacing: 0.05em;
+}
+.story-text {
+  font-family: 'Nunito', sans-serif; font-size: clamp(1rem, 3vw, 1.15rem);
+  line-height: 1.9; color: var(--text); font-weight: 600;
+}
+.story-text p { margin-bottom: 14px; }
+.story-text p:last-child { margin-bottom: 0; }
+.story-footer {
+  padding: 12px 16px 28px; display: flex; gap: 10px; align-items: center;
+  justify-content: center; border-top: 1px solid var(--border); flex-shrink: 0;
+  background: var(--surface);
+}
+.sf-btn {
+  padding: 12px 20px; border-radius: 100px; border: 1px solid var(--border);
+  background: var(--surface2); color: var(--text); cursor: pointer;
+  font-family: 'Fredoka One', cursive; font-size: 0.9rem; transition: all 0.2s;
+  display: flex; align-items: center; gap: 6px;
+}
+.sf-btn:hover { background: rgba(240,192,64,0.15); border-color: var(--gold); color: var(--gold); }
+.sf-btn.big {
+  padding: 14px 26px; font-size: 1rem;
+  background: linear-gradient(135deg, #d4a820, var(--gold));
+  color: #1a1a1a; border-color: transparent; font-weight: 900;
+}
+.sf-btn.big:hover { opacity: 0.9; transform: scale(1.03); }
+.sf-read-btn {
+  padding: 12px 18px; border-radius: 100px; border: 1px solid var(--border);
+  background: var(--surface2); color: var(--text-dim); cursor: pointer;
+  font-family: 'Fredoka One', cursive; font-size: 0.9rem; transition: all 0.2s;
+}
+.sf-read-btn.reading { background: rgba(240,192,64,0.2); border-color: var(--gold); color: var(--gold); }
+
+/* ── IMAGE PLACEHOLDER ── */
+.img-placeholder {
+  width: 100%; height: 100%; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 12px;
+  background: linear-gradient(160deg, #0d1e3a 0%, #1a2a4a 60%, #0a1628 100%);
+}
+.img-placeholder-emoji { font-size: 5rem; filter: drop-shadow(0 4px 16px rgba(240,192,64,0.4)); animation: floatEmoji 3s ease-in-out infinite; }
+@keyframes floatEmoji { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+.img-placeholder-text { font-family: 'Fredoka One', cursive; font-size: 0.9rem; color: var(--gold); letter-spacing: 0.05em; }
+.img-placeholder-sub { font-size: 0.72rem; color: var(--text-dim); }
+
+/* ── PROGRESS BAR ── */
+.reader-progress-bar { height: 3px; background: rgba(255,255,255,0.06); flex-shrink: 0; }
+.reader-progress-fill { height: 100%; background: linear-gradient(90deg, var(--gold), var(--gold2)); transition: width 0.4s; }
+</style>
+</head>
+<body>
+
+<!-- SPLASH -->
+<div id="splash">
+  <div class="splash-stars" id="splashStars"></div>
+  <div class="splash-book">📖</div>
+  <div class="splash-title">Bible Stories<br>for Children</div>
+  <div class="splash-sub">48 Amazing True Stories</div>
+  <div class="splash-verse">"From childhood you have known the Holy Scriptures." — 2 Timothy 3:15</div>
+  <button class="splash-btn" onclick="enterKids()">Let's Read! 🌟</button>
+</div>
+
+<!-- STORY READER -->
+<div id="reader">
+  <div class="reader-header">
+    <button class="reader-close" onclick="closeReader()">✕</button>
+    <div class="reader-title" id="readerTitle">Story</div>
+    <div class="reader-progress" id="readerProg"></div>
+    <button class="sf-read-btn" id="readAloudBtn" onclick="toggleReadAloud()">🔊 Read</button>
+  </div>
+  <div class="reader-progress-bar"><div class="reader-progress-fill" id="readerProgFill" style="width:0%"></div></div>
+  <div class="reader-body" id="readerBody">
+    <div class="story-image-wrap" id="storyImageWrap">
+      <div class="img-placeholder" id="imgPlaceholder">
+        <div class="img-placeholder-emoji" id="storyEmoji">📖</div>
+        <div class="img-placeholder-text" id="imgPlaceholderText">Loading illustration...</div>
+        <div class="img-placeholder-sub">Beautiful Biblical painting</div>
+      </div>
+      <div class="story-image-overlay"></div>
+      <div class="story-image-title" id="storyImageTitle"></div>
+      <div class="story-image-emoji" id="storyImageEmoji"></div>
+    </div>
+    <div class="story-content">
+      <div class="story-ref-badge" id="storyRef"></div>
+      <div class="story-text" id="storyText"></div>
+    </div>
+  </div>
+  <div class="story-footer">
+    <button class="sf-btn" onclick="prevStory()">◀ Back</button>
+    <button class="sf-btn big" onclick="nextStory()">Next Story ▶</button>
+    <button class="sf-btn" onclick="closeReader()">🏠</button>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="app">
+  <div class="topbar">
+    <div class="topbar-title">📖 Bible Stories</div>
+    <button class="audio-btn" id="topAudioBtn" onclick="toggleHomeAudio()">🔊 Welcome</button>
+  </div>
+  <div class="view">
+    <div class="home-header">✦ Choose a Story ✦ <span>48 Stories</span></div>
+    <div class="parts-list" id="partsList"></div>
+  </div>
+</div>
+
+<script>
+var STORIES = [{"id":1,"part":1,"partName":"Creation to the Flood","title":"God Makes Everything","emoji":"🌟","color":"#1a3a5c","imageQuery":"God creating earth heavens light biblical art children","text":"In the very beginning, there was nothing. No sun, no stars, no animals, no people. Just darkness and quiet.\n\nBut God was there.\n\nAnd God had a wonderful plan. He decided to make a beautiful world!\n\nFirst, God said, \"Let there be light!\" And suddenly there was light! Bright and warm and beautiful.\n\nThen God made the sky, stretching high above. He gathered the waters together and dry land appeared. Green grass grew, flowers bloomed, and tall trees reached up toward the sky.\n\nGod made the sun to shine in the daytime and the moon and stars to glow at night. He filled the seas with fish of every colour. He filled the skies with birds that sang and soared.\n\nThen God made all the animals — lions, elephants, horses, tiny little butterflies! Each one was different. Each one was wonderful.\n\nGod looked at everything He had made, and He smiled. It was very, very good!\n\nBut God was not finished yet. He had something even more special to make.","ref":"Genesis 1:1–25"},{"id":2,"part":1,"partName":"Creation to the Flood","title":"A Beautiful Garden","emoji":"🌿","color":"#1a4a2a","imageQuery":"Garden of Eden paradise beautiful garden Bible children illustration","text":"God made a very special garden called Eden. It was the most beautiful place you can imagine!\n\nThe garden had tall, shady trees loaded with delicious fruit. Crystal-clear rivers sparkled through it. Colourful flowers filled the air with sweet perfume. Every kind of animal lived there in peace.\n\nThen God did something truly amazing. He scooped up dust from the ground and shaped it into a man. Then God breathed life right into him!\n\nThe man's eyes opened. He took his first breath. He looked around at the beautiful world and smiled. God named him Adam.\n\nGod brought every animal to Adam, and Adam gave each one a name. Lion! Giraffe! Eagle! Turtle!\n\nBut God saw that Adam was lonely. He needed a friend.\n\nSo while Adam was sleeping, God took one of his ribs and made a woman. When Adam woke up and saw her, he was so happy!\n\nHer name was Eve. And together, Adam and Eve lived in the most beautiful garden in the world — as God's very own special friends.","ref":"Genesis 2:7–25"},{"id":3,"part":1,"partName":"Creation to the Flood","title":"The First Man and Woman","emoji":"👫","color":"#3a2a1a","imageQuery":"Adam Eve garden serpent tree Bible children illustration","text":"Adam and Eve were so happy in their beautiful garden! God loved them very much, and they loved God.\n\nGod told them, \"You may eat fruit from any tree in the garden — except one. Do not eat from the tree in the middle of the garden. If you eat from that tree, you will die.\"\n\nAdam and Eve understood. It was a simple rule from their loving Father.\n\nBut one day, a sneaky serpent came to Eve. This serpent was being used by Satan, a wicked angel who wanted to cause trouble.\n\n\"Did God really say you cannot eat that fruit?\" the serpent asked slyly. \"If you eat it, you will not die! You will become wise like God!\"\n\nEve looked at the beautiful fruit. She thought about it. And she made the wrong choice. She took the fruit and ate it. Then she gave some to Adam, and he ate it too.\n\nAt that moment, everything changed. They had disobeyed God. They felt ashamed and afraid.\n\nGod was very sad. He still loved Adam and Eve, but they had to leave the garden. They had broken their friendship with God.\n\nBut God made a promise — one day, everything would be made right again.","ref":"Genesis 2:16–17; 3:1–24"},{"id":4,"part":1,"partName":"Creation to the Flood","title":"Why They Lost Their Home","emoji":"😢","color":"#3a1a1a","imageQuery":"Adam Eve leaving garden Eden angels Bible children","text":"God had given Adam and Eve such a wonderful home. But now they had to leave.\n\nGod placed mighty angels called cherubs at the entrance to the garden. Their flaming swords turned every direction, making sure no one could go back inside.\n\nAdam and Eve stood outside and looked at the beautiful garden they had lost. How sad they must have felt!\n\nAll this happened because they chose not to obey God. One small act of disobedience changed everything.\n\nNow life would be hard. The ground would grow thorns and thistles. Adam would have to work and sweat to grow food. And one day, they would grow old and die — just as God had warned.\n\nBut God still cared about them. He made clothes for them from animal skins to keep them warm.\n\nEven when we make wrong choices, God is still watching over us. And God promised that someday He would fix everything that went wrong that day in the garden.\n\nThat was a promise God would never forget.","ref":"Genesis 3:16–24"},{"id":5,"part":1,"partName":"Creation to the Flood","title":"A Hard Life Begins","emoji":"🌾","color":"#3a3a1a","imageQuery":"Adam farming working hard ground Bible children illustration","text":"Outside the garden, life was very different. No more beautiful fruit hanging from every tree. No more gentle streams and sweet flowers everywhere.\n\nAdam had to work hard. He dug the ground with his hands. He pulled out thorns and thistles. He planted seeds and waited for rain. Working all day long just to grow enough food to eat!\n\nEve had to work hard too. Taking care of their home, cooking their food, and later caring for their children.\n\nAdam and Eve had many children. Their children had children. And those children had more children. Soon there were many people on the earth.\n\nSadly, many of them forgot about God. They did bad things to each other. They lied and stole and hurt one another.\n\nBut Adam and Eve remembered what they had lost. They remembered the beautiful garden. They remembered how wonderful it was to be God's friends.\n\nAnd they told their children about God, hoping that someday someone would listen and do right.\n\nAre you someone who wants to do right and be God's friend?","ref":"Genesis 3:16–19; 4:1–2"},{"id":6,"part":1,"partName":"Creation to the Flood","title":"A Good Son and a Bad One","emoji":"🐑","color":"#2a3a1a","imageQuery":"Cain Abel offering God Bible children illustration","text":"Adam and Eve had two sons. Their names were Cain and Abel.\n\nAbel loved God with all his heart. He was a shepherd who took care of fluffy sheep. When it was time to bring a gift to God, Abel chose his very best lamb — the finest one he had.\n\nCain was a farmer. He also brought a gift to God — some of the food he had grown. But Cain did not choose his very best.\n\nGod was pleased with Abel and his gift. But God was not pleased with Cain's gift.\n\nThis made Cain very angry. His face turned red with jealousy.\n\nGod said to Cain, \"Why are you so angry? If you do what is right, I will be pleased with you too. But be careful — sin is like a dangerous animal waiting to pounce on you!\"\n\nBut Cain did not listen. His anger grew and grew until one day, when they were out in the field together, Cain hurt his brother Abel. Abel died.\n\nGod was very sad. He said to Cain, \"What have you done? Your brother's blood is crying out to me!\"\n\nCain had to go away and live far from his family as a punishment. It is never good to let jealousy and anger grow in our hearts.","ref":"Genesis 4:1–16"},{"id":7,"part":1,"partName":"Creation to the Flood","title":"A Brave Man Named Enoch","emoji":"✨","color":"#1a2a4a","imageQuery":"Enoch walking with God ancient biblical illustration children","text":"Many, many years passed after Adam and Eve. The world filled up with people. But most of them had forgotten all about God. They did wicked things.\n\nBut there was one man who was different. His name was Enoch.\n\nEnoch loved God so much. Every single day, Enoch talked to God. He prayed and listened and tried with all his heart to do what was right. The Bible says that Enoch \"walked with God.\"\n\nCan you imagine that? Walking with God like a best friend!\n\nEnoch was also very brave. Even though the people around him were doing bad things, Enoch kept on doing good. He told people to obey God. Some people laughed at him. But Enoch did not stop.\n\nGod saw how faithful Enoch was. God loved Enoch very much.\n\nOne day, Enoch simply disappeared. God took Enoch to be with Him. Enoch did not have to grow old and die like others.\n\nWhat a wonderful reward for someone who walked with God every day!\n\nWe can be like Enoch too. We can talk to God every day. We can try to do what is right even when others around us don't. That is what it means to walk with God.","ref":"Genesis 5:21–24; Hebrews 11:5"},{"id":8,"part":1,"partName":"Creation to the Flood","title":"Giants in the Earth","emoji":"⚡","color":"#2a1a3a","imageQuery":"Nephilim giants fallen angels biblical illustration children","text":"Long ago, something very strange happened on the earth.\n\nSome of God's angels in heaven started doing wrong things. Instead of staying in heaven doing God's work, they came down to earth. They made themselves human bodies and married women.\n\nWhen they had children, those children were not ordinary. They grew into enormous giants! Some were as tall as two men standing on each other's shoulders!\n\nThese giants were called Nephilim. They were very strong and very mean. They bullied people and caused trouble everywhere they went.\n\nThe wicked angels and the giants made life very hard for everyone on earth.\n\nGod looked down and saw how wicked and violent the earth had become. It made God very sad. Almost nobody wanted to do right anymore.\n\nBut there was still one good man left. His name was Noah.\n\nNoah was different from everyone else. He prayed to God. He tried to do right. He taught his wife and his three sons — Shem, Ham, and Japheth — to love God too.\n\nGod saw Noah's faithful heart. And God had a very big plan for this very good man.\n\nLet's find out what it was!","ref":"Genesis 6:1–8; Jude 6"},{"id":9,"part":1,"partName":"Creation to the Flood","title":"Noah Builds an Ark","emoji":"🚢","color":"#1a3a4a","imageQuery":"Noah building ark wood Bible children illustration","text":"One day God spoke to Noah.\n\n\"Noah,\" God said, \"I am going to send a great flood to cover the whole earth. I want you to build a very big boat called an ark.\"\n\nGod told Noah exactly how to build it — how long, how wide, how tall. It was going to be enormous! As long as one and a half football fields! Three floors high!\n\nNoah did not ask \"Why?\" or \"Are you sure?\" He simply said yes and started building.\n\nChop! Chop! Chop! Noah and his sons cut down trees and shaped the wood. They hammered and sawed day after day. It took many, many years.\n\nThe people who lived nearby thought Noah was crazy. \"There is no flood coming!\" they laughed. \"You are building a boat in the middle of dry land!\" They mocked Noah and pointed at him.\n\nBut Noah kept on building. He trusted God completely.\n\nWhen the ark was finished, it was beautiful and strong. God told Noah to bring food inside — enough for his family and all the animals.\n\nThen God said, \"Bring two of every kind of animal into the ark — a male and a female. I will keep them all safe.\"\n\nNoah did everything God told him to do. Every single thing.","ref":"Genesis 6:9–22; 7:1–9"},{"id":10,"part":1,"partName":"Creation to the Flood","title":"The Great Flood","emoji":"🌊","color":"#0a1a3a","imageQuery":"Noah ark animals flood rain Bible children illustration","text":"The day finally came.\n\nAnimals came from everywhere — walking, hopping, slithering, trotting. Two by two they climbed into the ark. Elephants and rabbits. Lions and lambs. Giraffes and tiny beetles. Noah and his family watched in wonder.\n\nWhen every animal was safely inside, God Himself closed the big door.\n\nThen the rain began.\n\nDrop by drop at first. Then faster. Then it poured like great rivers falling from the sky! Water gushed up from deep underground too. The flood was coming from everywhere!\n\nThe people who had laughed at Noah were not laughing now. The water rose higher and higher.\n\nBut Noah and his family were safe and dry inside the ark. The great boat lifted off the ground and floated on the water. God was taking care of them.\n\nFor forty days and forty nights the rain fell. Water covered everything — even the tallest mountains!\n\nBut the ark floated safely. The animals were safe. Noah's family was safe.\n\nGod had not forgotten them. Not even for one moment.\n\nWhen you trust God and do what He says, He will always take care of you too.","ref":"Genesis 7:10–24"},{"id":11,"part":2,"partName":"The Flood to Egypt","title":"The First Rainbow","emoji":"🌈","color":"#1a3a2a","imageQuery":"Noah rainbow after flood dove olive branch Bible children","text":"For many months, Noah and his family lived inside the floating ark. They fed the animals and cared for them every day.\n\nThen one day, Noah felt the ark stop moving. It had landed on top of a mountain called Ararat!\n\nNoah sent out a raven and a dove to see if the land was dry. The dove came back — there was nowhere to land yet. Noah waited.\n\nOne week later, he sent the dove again. This time the little dove came back carrying a fresh green olive leaf in its beak! Noah was so happy. The trees were coming out of the water!\n\nOne week later, Noah sent the dove out once more. This time the dove did not come back. It had found a dry place to live!\n\nGod said to Noah, \"Come out of the ark! You and your family and all the animals are free!\"\n\nWhat a day that was! The sunshine! The fresh air! The green earth! The animals ran and flew and leaped out with joy!\n\nNoah and his family knelt down and thanked God with full hearts.\n\nThen God did something beautiful. He put a magnificent rainbow in the sky — red, orange, yellow, green, blue, and violet!\n\n\"Every time you see a rainbow,\" God promised, \"remember that I will never flood the whole earth again.\"\n\nEver since that day, every rainbow reminds us of God's promise.","ref":"Genesis 8:1–22; 9:11–17"},{"id":12,"part":2,"partName":"The Flood to Egypt","title":"The Tower of Babel","emoji":"🏰","color":"#3a2a1a","imageQuery":"Tower of Babel ancient city Bible children illustration","text":"After the flood, Noah's children had many children, and those children had more children. Soon there were lots of people on the earth again.\n\nGod had told people to spread out and fill the earth. But many people decided not to listen.\n\n\"Let's all stay together right here,\" they said. \"Let's build a great city! And let's build a tower so tall it reaches all the way to the sky! Everyone will talk about us!\"\n\nThey were not building the tower for God. They were building it to make themselves famous. They were very proud.\n\nGod looked down at the tower and shook His head. These people were only thinking about themselves.\n\nGod had a clever plan. At that time, everyone on earth spoke the same language. God changed that! Suddenly, people could not understand each other anymore. One man would say something and his friend would look at him with a puzzled face.\n\n\"What?!\" \"Huh?!\" \"I don't understand you!\"\n\nPeople who spoke the same new language gathered together and moved to different parts of the earth. The great building project stopped.\n\nThe city was called Babel, which means \"confused.\" And that is how different languages came into the world!","ref":"Genesis 11:1–9"},{"id":13,"part":2,"partName":"The Flood to Egypt","title":"Abraham — A Friend of God","emoji":"⭐","color":"#2a1a3a","imageQuery":"Abraham stars night sky Bible children illustration","text":"Many years after the flood, there lived a man named Abram. Later, God would give him the new name Abraham, which means \"Father of Many Nations.\"\n\nAbraham lived in a city called Ur with his wife Sarah. It was a big, comfortable city. Abraham had a nice home there.\n\nOne day, God spoke to Abraham. \"Leave your home and your city,\" God said. \"Go to a land I will show you. I will bless you greatly and make your family into a great nation!\"\n\nLeave everything? Go somewhere new? Abraham did not know exactly where he was going. But he trusted God completely.\n\nSo Abraham packed up everything. He took his wife Sarah, his nephew Lot, all his servants, and all his animals and belongings. And off they went on their big adventure with God!\n\nThey walked for many, many miles. Finally they came to the land of Canaan.\n\nGod said, \"This is the land I am giving to you and your children and grandchildren — forever!\"\n\nOne night God took Abraham outside. \"Look up at the sky,\" God said. \"Count the stars if you can!\"\n\nAbraham looked up. Stars stretched across the sky like a sparkling river. So many! He could never count them all!\n\n\"Your family will be just as many as those stars,\" God promised.\n\nAbraham believed God. That is why the Bible calls Abraham \"a friend of God.\" ","ref":"Genesis 12:1–9; 15:5–6; James 2:23"},{"id":14,"part":2,"partName":"The Flood to Egypt","title":"God Tests Abraham's Faith","emoji":"🙏","color":"#2a1a1a","imageQuery":"Abraham Isaac mountain altar Bible children illustration","text":"Abraham and Sarah waited many, many years for a baby. They were very old — Sarah was ninety years old! — when God finally kept His promise.\n\nA baby boy was born! They named him Isaac, which means \"laughter.\" How they laughed for joy!\n\nIsaac grew up strong and healthy. He was the child of God's promise. Abraham and Sarah loved him more than anything.\n\nThen one day, God did something that seemed very hard to understand. He asked Abraham to take Isaac up a mountain as a special offering.\n\nAbraham's heart must have ached. But he trusted God. He had always trusted God.\n\nAbraham and Isaac climbed the mountain together. Isaac carried the wood. He asked, \"Father, we have the fire and the wood, but where is the lamb for the offering?\"\n\nAbraham said quietly, \"God will provide, my son.\"\n\nWhen they reached the top, Abraham built an altar. He was about to obey God completely.\n\nBut then — a voice from heaven! \"Abraham! Abraham! Stop! Do not hurt the boy! Now I know that you truly love God with all your heart!\"\n\nAbraham looked up and saw a ram caught in a bush nearby. That was the offering God had provided!\n\nAbraham named that place \"God Will Provide.\" Because He always does.","ref":"Genesis 22:1–18"},{"id":15,"part":2,"partName":"The Flood to Egypt","title":"Lot's Wife Looked Back","emoji":"🌋","color":"#3a1a1a","imageQuery":"Sodom Gomorrah fire angels Lot fleeing Bible children","text":"Abraham's nephew Lot had gone to live in a city called Sodom. Sodom was a wicked, wicked city. The people there did terrible things.\n\nGod decided it was time to destroy Sodom and its neighbour Gomorrah.\n\nBut God loved Lot. So He sent two angels to warn him.\n\nThe angels came to Lot's house. \"Get out of this city right now!\" they said. \"Take your wife and daughters and run! God is going to destroy this place!\"\n\nLot's sons-in-law did not believe the warning. They laughed. So they stayed behind.\n\nThe angels actually took Lot, his wife, and his daughters by the hand and hurried them out of the city.\n\n\"Run for your lives!\" the angels said. \"Don't stop! Don't look back!\"\n\nLot and his daughters ran. They ran as fast as they could up the mountain.\n\nBut Lot's wife slowed down. She turned and looked back at the city she was leaving behind.\n\nAnd she turned into a pillar of salt.\n\nWhy? Because she loved the wicked city more than she obeyed God's clear warning.\n\nJesus later said: \"Remember Lot's wife.\" It is a reminder to always look forward and obey God — never look back at the wrong things we have left behind.","ref":"Genesis 19:1–26; Luke 17:32"},{"id":16,"part":2,"partName":"The Flood to Egypt","title":"Jacob and Esau","emoji":"👬","color":"#2a3a1a","imageQuery":"Jacob Esau twins Bible children illustration","text":"Isaac grew up and married a woman named Rebekah. They had twin boys! The first twin was born with red hair all over his body, so they named him Esau. The second twin was born holding his brother's heel, so they named him Jacob.\n\nEsau loved the outdoors. He was a great hunter who brought home wild game for dinner. Isaac was very fond of Esau.\n\nJacob was quieter and stayed near the tents. Rebekah loved Jacob very much.\n\nOne day, Esau came home from hunting feeling very hungry and tired. Jacob had made a delicious pot of red soup.\n\n\"Give me some of that soup!\" Esau said. \"I'm starving!\"\n\n\"I'll give you soup,\" said Jacob cleverly, \"if you give me your birthright.\" The birthright was the special blessing that belonged to the eldest son.\n\n\"What good is a birthright if I die of hunger?\" said Esau carelessly. And he gave it away for a bowl of soup!\n\nLater, Jacob also tricked his father Isaac into giving him the blessing meant for Esau.\n\nEsau was furious. Jacob had to run away to stay safe.\n\nBut God watched over Jacob through all his adventures. And one day, God would change Jacob's name to Israel — the name of God's chosen people.","ref":"Genesis 25:24–34; 27:1–45"},{"id":17,"part":2,"partName":"The Flood to Egypt","title":"Joseph and His Brothers","emoji":"🌈","color":"#1a2a4a","imageQuery":"Joseph coat many colours brothers Bible children illustration","text":"Jacob had twelve sons. But his favourite was Joseph. Jacob gave Joseph a beautiful coat of many colours!\n\nJoseph's brothers saw the special coat and their hearts filled with jealousy. Why did Joseph get a special coat and not them?\n\nThen Joseph had two dreams. In the first dream, his brothers' bundles of grain bowed down to his bundle. In the second dream, the sun, moon, and eleven stars bowed down to him.\n\n\"Do you think you are going to rule over us?\" his brothers sneered angrily.\n\nOne day, the brothers were out in the fields far from home. Jacob sent Joseph to check on them.\n\nWhen they saw Joseph coming in his beautiful coat, the brothers said to each other, \"Here comes that dreamer. Let's get rid of him!\"\n\nThey grabbed Joseph, tore off his coat, and threw him into a deep pit. Then they sold him to some travelling merchants as a slave for twenty pieces of silver!\n\nThe merchants took Joseph far away to Egypt.\n\nThe brothers dipped Joseph's coat in goat's blood and brought it to their father Jacob. \"We found this,\" they said.\n\nJacob wept for many days. He thought his beloved son was dead.\n\nBut God had not forgotten Joseph. God had big plans for him.","ref":"Genesis 37:1–35"},{"id":18,"part":2,"partName":"The Flood to Egypt","title":"Joseph in Egypt","emoji":"🏺","color":"#3a2a1a","imageQuery":"Joseph Egypt prison Pharaoh Bible children illustration","text":"Joseph arrived in Egypt as a slave. He was bought by a man named Potiphar, an important officer of Pharaoh the king.\n\nEven as a slave, Joseph worked hard and did everything right. God was with Joseph and blessed everything he did. Potiphar noticed this and put Joseph in charge of his whole household.\n\nBut then trouble came. Potiphar's wife told lies about Joseph. Poor innocent Joseph was thrown into prison!\n\nBut even in prison, God was with Joseph. The prison master trusted Joseph and gave him responsibilities.\n\nIn prison, Joseph met two men who had worked for Pharaoh — a butler and a baker. Each had a strange dream.\n\nGod helped Joseph understand their dreams. \"Your dream means you will be freed and return to work for Pharaoh in three days,\" Joseph told the butler. He was right!\n\nJoseph asked the butler to remember him and help him get out of prison. But the butler forgot all about Joseph.\n\nTwo more long years passed. Then one night, Pharaoh himself had two very troubling dreams that no one could explain.\n\nFinally, the butler remembered! \"There is a young man in prison who can explain dreams!\" he said.\n\nJoseph was quickly brought from prison to stand before the great king of Egypt.","ref":"Genesis 39:1–23; 40:1–23"},{"id":19,"part":2,"partName":"The Flood to Egypt","title":"Pharaoh's Dreams","emoji":"👑","color":"#3a3a1a","imageQuery":"Pharaoh dreams Egypt grain cows Bible children illustration","text":"Joseph was cleaned up, given fresh clothes, and brought before the mighty Pharaoh.\n\nPharaoh said, \"I had two dreams and no one can explain them. I heard you can explain dreams.\"\n\n\"I cannot,\" said Joseph humbly, \"but God can. God will give Pharaoh the answer.\"\n\nPharaoh told his dreams. In the first, seven fat, healthy cows came up from the river. Then seven thin, bony cows came up and ate the fat cows! In the second dream, seven full heads of grain grew on one stalk. Then seven thin, scorched heads of grain swallowed them up!\n\nJoseph said, \"Both dreams mean the same thing. God is showing you what He is about to do. Seven years of wonderful harvests are coming — crops growing everywhere! But after that, seven years of terrible famine will come. No rain, no crops, nothing to eat.\"\n\nThen Joseph gave Pharaoh wise advice: save food during the good years to survive the bad years.\n\nPharaoh looked at Joseph with amazement. \"Can we find anyone else who has the Spirit of God in him like this man?\" he said.\n\nThat very day, Pharaoh put Joseph in charge of all of Egypt — second only to Pharaoh himself!\n\nThe boy who had been sold as a slave was now the ruler of the most powerful nation on earth. God had kept His hand on Joseph all along!","ref":"Genesis 41:1–46"},{"id":20,"part":2,"partName":"The Flood to Egypt","title":"Joseph Tests His Brothers","emoji":"🤝","color":"#1a3a1a","imageQuery":"Joseph brothers Egypt reunion Bible children illustration","text":"Just as Joseph said, seven years of wonderful harvests came. Joseph stored up so much grain that he stopped counting! Then the famine came and it was just as bad as Joseph had predicted.\n\nEverywhere people were hungry. In the land of Canaan, Jacob's family had no food either.\n\n\"Go to Egypt,\" Jacob told his sons. \"I have heard there is grain there.\"\n\nTen of Joseph's brothers made the long journey to Egypt. They came and bowed down before the great governor — not knowing it was their own brother Joseph!\n\nJoseph recognised them immediately. His heart leaped. But he kept his face calm and spoke through an interpreter, pretending not to know them.\n\nJoseph tested his brothers. He wanted to see if their hearts had changed since the day they sold him into slavery.\n\nHe treated them harshly at first and kept one brother as a prisoner. He told them to bring their youngest brother Benjamin when they returned.\n\nWhen they thought no one could hear, the brothers said to each other, \"We are being punished because of what we did to our brother Joseph all those years ago!\"\n\nJoseph heard this and had to leave the room. He wept privately.\n\nHis brothers' hearts had changed. They were sorry for what they had done.\n\nSoon Joseph would have the most wonderful surprise waiting for them!","ref":"Genesis 42:1–38"},{"id":21,"part":3,"partName":"Moses and the Exodus","title":"The Baby in the Basket","emoji":"🌿","color":"#1a3a3a","imageQuery":"Baby Moses basket Nile river reeds Bible children illustration","text":"Many years passed. Joseph and all his brothers had died. But their children and grandchildren and great-grandchildren stayed in Egypt. They were called the Israelites.\n\nThe Israelites grew in number until there were thousands and thousands of them! The new Pharaoh of Egypt saw this and was afraid.\n\n\"There are too many Israelites!\" he said. \"What if they rise up against us?\" So he made them slaves. He gave them back-breaking work — making bricks, building great buildings — all day long in the hot sun.\n\nThen Pharaoh gave a terrible order: every baby boy born to an Israelite family must be thrown into the River Nile!\n\nOne Israelite mother had a beautiful baby boy. She loved him so much she could not bear to let him go. She hid him for three months.\n\nWhen she could hide him no longer, she did something clever. She made a little basket from reeds and waterproofed it with tar. She put her baby inside and set the basket among the reeds at the edge of the Nile River.\n\nHis sister Miriam watched from nearby to see what would happen.\n\nThen Pharaoh's own daughter came to bathe in the river. She spotted the basket! When she opened it and saw the baby, she felt so sorry for him.\n\n\"This must be one of the Hebrew babies,\" she said softly.\n\nMiriam stepped forward bravely. \"Shall I find a Hebrew woman to nurse the baby for you?\"\n\n\"Yes, go,\" said the princess.\n\nAnd Miriam ran to get — their own mother! The mother was paid to nurse her own son! God had taken care of the baby.\n\nPharaoh's daughter adopted the boy and named him Moses, which means \"drawn out of the water.\" ","ref":"Exodus 1:1–2:10"},{"id":22,"part":3,"partName":"Moses and the Exodus","title":"The Burning Bush","emoji":"🔥","color":"#3a2a1a","imageQuery":"Moses burning bush God Sinai Bible children illustration","text":"Moses grew up as a prince in Pharaoh's palace. But he knew he was really an Israelite. One day he saw an Egyptian hitting an Israelite slave and Moses stepped in to help. Afraid of what would happen, Moses ran away from Egypt and went to live in the desert.\n\nMoses became a shepherd in a land called Midian. He married a woman named Zipporah. For forty years he lived a quiet life taking care of sheep.\n\nOne day Moses led his flock to the far side of the desert, near a mountain called Sinai.\n\nSuddenly he saw something extraordinary — a bush was on fire! But as Moses watched, he realised the bush was not burning up. The flames danced but the bush stayed green and whole.\n\n\"I must go and look at this strange sight!\" Moses said.\n\nAs he came closer, a voice called from the bush: \"Moses! Moses!\"\n\n\"Here I am!\" Moses replied.\n\n\"Do not come closer. Take off your sandals — you are standing on holy ground. I am the God of your father, the God of Abraham, Isaac, and Jacob.\"\n\nMoses covered his face, afraid to look at God.\n\nGod said, \"I have seen how my people suffer in Egypt. I have heard them crying. I am sending YOU to bring my people out of Egypt!\"\n\nMoses felt very small. \"Who am I to do this?\" he asked.\n\n\"I will be with you,\" God said simply. And that was enough.","ref":"Exodus 2:11–3:15"},{"id":23,"part":3,"partName":"Moses and the Exodus","title":"The Ten Plagues","emoji":"🐸","color":"#1a2a1a","imageQuery":"Moses Pharaoh plagues Egypt Bible children illustration","text":"Moses went back to Egypt with his brother Aaron. Together they stood before the powerful Pharaoh.\n\n\"God says: Let my people go!\" Moses declared.\n\nPharaoh crossed his arms. \"Who is this God? I don't know Him and I will NOT let Israel go!\"\n\nSo God sent plagues — amazing, terrible signs to show Pharaoh that God was real and more powerful than all of Egypt's false gods.\n\nFirst, all the water in Egypt turned to blood! The fish died, the rivers smelled terrible. Pharaoh still said no.\n\nThen millions of frogs hopped out of the rivers and filled every house, every bed, every cooking pot! Pharaoh begged Moses to stop the frogs. Then changed his mind.\n\nGod sent lice, then flies that swarmed everywhere — but only in the Egyptian homes, not where the Israelites lived!\n\nThe animals of Egypt got sick and died. Sores broke out on the skin of every Egyptian. Great hailstones crashed down from the sky. Millions of locusts ate every green thing. Then thick darkness covered Egypt for three days — so dark you could feel it. But again, there was light in the Israelite homes!\n\nAfter each plague, Pharaoh seemed ready to let the people go. But then he changed his stubborn mind.\n\nOne final, terrible plague was coming. This one would change everything.","ref":"Exodus 7:14–10:29"},{"id":24,"part":3,"partName":"Moses and the Exodus","title":"The Passover Night","emoji":"🐑","color":"#2a1a3a","imageQuery":"Passover lamb blood doorpost Egypt Bible children illustration","text":"God told Moses, \"I will send one final plague on Egypt. At midnight, the firstborn son in every Egyptian home will die. Then Pharaoh will beg you to leave.\"\n\nBut God wanted to protect the Israelites. He gave them special instructions.\n\n\"Each family must take a perfect lamb. On the fourteenth day, sacrifice the lamb at sunset. Take its blood and paint it on the top and sides of your doorframe. Then roast the lamb and eat it quickly — with unleavened bread and bitter herbs. Be dressed and ready to travel. Do not go outside until morning.\"\n\nThe Israelites obeyed completely. That evening, every Israelite home had red blood painted on the doorframe.\n\nAt midnight, God passed through Egypt. Every Egyptian family lost their firstborn son — from the greatest family to the least. A great cry went up through all of Egypt.\n\nBut God's angel passed over every home that had the blood on the doorframe. Every Israelite child was safe.\n\nThis is why it is called the Passover — God passed over the homes with the blood.\n\nPharaoh woke in the night and cried out to Moses. \"GO! Take everyone! Take everything! Leave Egypt at once!\"\n\nAfter 430 years as slaves, the Israelites were free!","ref":"Exodus 11:1–12:36"},{"id":25,"part":3,"partName":"Moses and the Exodus","title":"Crossing the Red Sea","emoji":"🌊","color":"#0a2a3a","imageQuery":"Moses Red Sea parting waves Israelites crossing Bible children","text":"Six hundred thousand Israelite men left Egypt — plus women and children! It was a huge crowd stretching as far as the eye could see.\n\nGod led them with a pillar of cloud by day and a pillar of fire by night, so they always knew which way to go.\n\nBut then Pharaoh changed his mind — again! He gathered his best soldiers and six hundred chariots and thundered after the Israelites.\n\nThe Israelites looked back and saw the Egyptian army coming. In front of them was the Red Sea. They were trapped!\n\nThe people were terrified. They cried out to Moses, \"Did you bring us here to die in the desert?\"\n\nBut Moses stretched his hand out over the water and called out bravely, \"Do not be afraid! Stand firm! Watch what God will do today!\"\n\nThen God sent a powerful east wind. All night it blew. The waters of the Red Sea divided — walls of water standing up on each side — and dry ground appeared between them!\n\nThe Israelites walked through on dry ground. Walls of water towered on their right and left. They walked safely to the other side!\n\nWhen the Egyptian army followed — the waters crashed back down! The sea covered the horses and chariots. The Egyptian army was gone.\n\nThe Israelites stood on the other side, safe and free. They sang and danced and praised God with all their hearts!","ref":"Exodus 14:1–31"},{"id":26,"part":4,"partName":"The Promised Land","title":"Food from Heaven","emoji":"🍞","color":"#3a3a1a","imageQuery":"Manna quail falling from sky desert Israelites Bible children","text":"The Israelites were free from Egypt! But now they were walking through a great, dry desert. There were no supermarkets in the desert. No fruit trees. No farms.\n\nThe people began to complain. \"At least in Egypt we had food to eat! Now we are going to starve out here!\"\n\nGod heard their grumbling and was patient with them.\n\n\"I will rain down bread from heaven,\" God told Moses. \"Each morning the people should go out and gather enough for that day — no more. On the sixth day they may gather double, because there is no gathering on the Sabbath rest day.\"\n\nThe next morning, when the dew dried up, the ground was covered with small, white, flaky things. They looked like frost on the ground.\n\nThe people looked at each other. \"What is it?\" they said — which is actually what the word \"manna\" means!\n\n\"This is the bread God has given you to eat,\" Moses told them.\n\nAnd it tasted wonderful — sweet like honey wafers!\n\nGod also sent flocks of little birds called quail right into the camp each evening, so the people had meat too.\n\nEvery single morning for forty years in the desert, God sent manna. Every day. Not once did He forget.\n\nGod always provides for His people. Always.","ref":"Exodus 16:1–35"},{"id":27,"part":4,"partName":"The Promised Land","title":"The Ten Commandments","emoji":"📜","color":"#1a1a3a","imageQuery":"Moses Ten Commandments stone tablets Sinai Bible children","text":"Three months after leaving Egypt, the Israelites came to Mount Sinai — the mountain where God had spoken to Moses from the burning bush.\n\nGod told Moses, \"Tell the people to prepare themselves. I am going to speak to them.\"\n\nOn the third morning, thunder rolled and lightning flashed on the mountain. A thick cloud covered the peak. A sound like a great trumpet blast rang through the air! All the people trembled.\n\nThen God Himself spoke — His voice booming across the mountain like thunder.\n\nGod gave His people Ten Commandments — ten very important rules for living a good and happy life:\n\nOne God alone. No idols. Respect God's name. Keep the Sabbath rest day. Honour your father and mother. Do not kill. Be faithful in marriage. Do not steal. Do not lie. Do not be jealous of what others have.\n\nThe people were so frightened by God's great power that they stepped back and said to Moses, \"Please, you speak to us! If God speaks directly to us we might die!\"\n\nLater, God called Moses up the mountain. Moses was up there for forty days and forty nights! God wrote the Ten Commandments on two flat stones with His own finger.\n\nThese ten rules are still important for us today.","ref":"Exodus 19:1–20:21; 31:18"},{"id":28,"part":4,"partName":"The Promised Land","title":"The Golden Calf","emoji":"🐄","color":"#3a2a1a","imageQuery":"Golden calf Israelites Moses angry Bible children illustration","text":"Moses was up on Mount Sinai for a very long time. Forty days is a long time to wait!\n\nThe people became impatient. They started to worry. \"Where is Moses? Maybe he is never coming back!\"\n\nThey went to Aaron, Moses's brother. \"Make us a god we can see!\" they demanded.\n\nAaron should have said no firmly. But instead he collected all the gold earrings from the people and melted them down. He shaped the gold into a calf!\n\n\"Here is your god!\" he said. \"The one who brought you out of Egypt!\"\n\nThe people were delighted. They sang and danced around the golden calf. They worshipped it!\n\nUp on the mountain, God told Moses what was happening. \"Go down! Your people are worshipping an idol and they have forgotten Me!\"\n\nMoses hurried down the mountain, carrying the two stone tablets God had written on. When he saw the dancing and the golden calf, he was so angry that he threw the stone tablets down and they shattered!\n\nHe melted the golden calf, ground it to powder, mixed it with water, and made the people drink it!\n\nThen Moses went back up the mountain and prayed hard for the people. God forgave them and gave Moses new stone tablets.\n\nBut this day was a lesson — we must never put anything or anyone in God's place.","ref":"Exodus 32:1–35; 34:1–4"},{"id":29,"part":4,"partName":"The Promised Land","title":"The Twelve Spies","emoji":"🍇","color":"#2a3a1a","imageQuery":"Twelve spies Canaan grapes Joshua Caleb Bible children","text":"After wandering in the desert for a long time, the Israelites came close to the land God had promised them — the land of Canaan.\n\n\"Send twelve spies,\" God told Moses. \"Let them explore the land and bring back a report.\"\n\nOne man was chosen from each of the twelve tribes. Among them were Joshua and Caleb, two men of great faith and courage.\n\nFor forty days the twelve men secretly explored the land. They saw beautiful, fertile soil. They found grapes so enormous that two men had to carry one bunch between them on a pole!\n\nWhen they returned, they showed the people the amazing fruit. \"The land truly is wonderful!\" they said. \"It flows with milk and honey, just as God said!\"\n\nBut ten of the spies continued: \"However — the cities are very large with high walls. And the people who live there are like giants! We felt like grasshoppers compared to them!\"\n\nThe people wept and complained. \"We cannot do it! We should go back to Egypt!\"\n\nBut Joshua and Caleb stood up boldly. \"Do not be afraid! If God is pleased with us, He will give us that land! Do not be afraid of those people! God is with us!\"\n\nThe people would not listen. Because of their lack of faith, God made them wander in the desert for forty years — one year for each day the spies explored the land.","ref":"Numbers 13:1–14:38"},{"id":30,"part":4,"partName":"The Promised Land","title":"The Walls of Jericho","emoji":"🏰","color":"#3a1a1a","imageQuery":"Walls Jericho Joshua trumpets Bible children illustration","text":"After forty years in the desert, Moses died. His faithful helper Joshua became the leader.\n\nGod told Joshua, \"Be strong and courageous! I will be with you wherever you go!\"\n\nThe Israelites crossed the Jordan River — the water piled up like a wall while they crossed on dry ground, just like the Red Sea!\n\nNow they faced a great challenge. The city of Jericho stood before them with massive walls so thick that houses were built into them. Jericho's gates were tightly shut. No one went in. No one came out.\n\nGod gave Joshua the strangest battle plan ever:\n\n\"March around the city once a day for six days. Have seven priests carry trumpets made of ram's horns in front of the ark. On the seventh day, march around the city seven times, with the priests blowing their trumpets. Then have all the people shout with a great shout!\"\n\nIt seemed so strange. But Joshua and the people obeyed.\n\nFor six days they marched around the city in silence. On the seventh day they marched around seven times. Then the priests blew a long, loud blast.\n\n\"SHOUT!\" Joshua commanded. \"God has given you the city!\"\n\nThe people shouted with all their might. And the great walls of Jericho — those enormous, thick walls — crumbled and fell flat!\n\nWhen God fights for you, no wall can stand.","ref":"Joshua 1:1–9; 6:1–25"},{"id":31,"part":5,"partName":"Kings and Prophets","title":"David and Goliath","emoji":"🗡️","color":"#2a1a3a","imageQuery":"David Goliath sling stone battle Bible children illustration","text":"The Israelites were at war with the Philistines. Every morning a giant soldier named Goliath marched out from the Philistine army.\n\nGoliath was enormous — over nine feet tall! He wore a great bronze helmet and heavy armour. He carried a massive spear. His voice boomed across the valley like thunder.\n\n\"Send me your best fighter!\" Goliath bellowed. \"If he beats me, we will be your servants! But if I beat him — you will be OUR servants!\"\n\nEvery Israelite soldier looked at Goliath and trembled. Not one of them dared to fight him.\n\nThen a young shepherd boy named David came to bring food to his brothers in the army.\n\nDavid heard Goliath shouting his challenge. \"Who is this man who dares to insult the army of the living God?\" David said.\n\nKing Saul heard about David and called for him. \"You are just a boy,\" Saul said. \"Goliath has been a warrior since he was young.\"\n\n\"God helped me kill lions and bears to protect my sheep,\" David said bravely. \"God will help me with this Philistine too!\"\n\nDavid ran toward Goliath with his sling and five smooth stones.\n\n\"Come here and I will feed you to the birds!\" Goliath roared.\n\nDavid called back: \"You come with a sword and spear, but I come in the name of the LORD God of Israel!\"\n\nDavid whirled his sling — crack! The stone hit Goliath right between the eyes. The giant fell face down into the ground.\n\nWith God's help, a shepherd boy defeated a giant.","ref":"1 Samuel 17:1–51"},{"id":32,"part":5,"partName":"Kings and Prophets","title":"Wise King Solomon","emoji":"⚖️","color":"#3a3a1a","imageQuery":"Solomon wisdom temple prayer God Bible children illustration","text":"David became a great king of Israel. When he was old, his son Solomon became king.\n\nOne night, God spoke to Solomon in a dream. \"Ask me for anything you want,\" God said, \"and I will give it to you!\"\n\nWhat an incredible offer! What would you ask for?\n\nSolomon could have asked for riches. He could have asked for a long life. He could have asked for victory over all his enemies.\n\nBut Solomon asked for something different.\n\n\"God, I am like a little child who does not know how to lead your great people. Please give me wisdom — an understanding heart — so I can know right from wrong and lead your people well.\"\n\nGod was so pleased with this answer! \"Because you asked for wisdom instead of riches or long life,\" God said, \"I will give you the wisest mind that has ever lived — and no one after you will be wiser. And because you asked unselfishly, I will also give you riches and honour greater than any other king!\"\n\nSolomon became famous all over the world for his great wisdom. People came from faraway lands just to listen to him.\n\nSolomon also built God a magnificent Temple in Jerusalem — the most beautiful building anyone had ever seen. It took seven years to build and was filled with gold and precious things.\n\nWhen we ask God for wisdom above everything else, He is always pleased.","ref":"1 Kings 3:3–15; 4:29–34; 6:1–38"},{"id":33,"part":5,"partName":"Kings and Prophets","title":"Elijah and the Still Small Voice","emoji":"🌪️","color":"#1a2a3a","imageQuery":"Elijah cave mountain still small voice God Bible children","text":"Elijah was one of God's bravest prophets. He stood up against the wicked Queen Jezebel and the false prophets of Baal.\n\nOne day, Elijah prayed and fire came down from heaven! He proved that God is real and Baal was just a useless stone statue.\n\nBut then Queen Jezebel sent Elijah a message: \"I will have you killed by tomorrow!\"\n\nEven brave Elijah got scared. He ran into the desert and sat under a tree. \"God, I've had enough!\" he said sadly. \"Take my life. I'm no better than anyone else.\" Then he fell asleep.\n\nAn angel touched him. \"Get up and eat!\" the angel said. There beside him was freshly baked bread and a jar of water. Elijah ate and drank and went back to sleep.\n\nThe angel came again. \"Get up and eat, the journey ahead is too long for you.\"\n\nStrengthened by the food, Elijah walked forty days and forty nights until he reached Mount Horeb — the mountain of God.\n\nGod said, \"What are you doing here, Elijah?\"\n\nThen came a mighty wind that split rocks apart. Then an earthquake. Then fire!\n\nBut God was not in the wind. Not in the earthquake. Not in the fire.\n\nAfter the fire — a still, small voice. Gentle and quiet.\n\nThat was where God was. In the still, small voice.\n\nSometimes God speaks loudest when we are quiet and still enough to listen.","ref":"1 Kings 19:1–18"},{"id":34,"part":5,"partName":"Kings and Prophets","title":"Jonah and the Big Fish","emoji":"🐋","color":"#0a2a3a","imageQuery":"Jonah whale fish sea Bible children illustration","text":"God told His prophet Jonah, \"Go to the great city of Nineveh and tell the people there to stop doing wrong things.\"\n\nBut Jonah did not want to go. He did not like the people of Nineveh. So instead of going to Nineveh, Jonah ran the other way! He got on a ship going in the opposite direction.\n\nGod sent a powerful storm. The waves tossed the ship like a toy. The sailors were terrified. They threw cargo into the sea to lighten the load.\n\nJonah was fast asleep below deck. The captain woke him. \"How can you sleep?! Pray to your God!\"\n\nThe sailors cast lots to find out who had caused the trouble. The lot fell on Jonah.\n\n\"Who are you? What have you done?\" they demanded.\n\n\"I am Hebrew. I worship the God who made the sea and the land. And I am running away from Him,\" Jonah confessed.\n\n\"Throw me into the sea,\" Jonah said. \"Then the storm will stop. This is my fault.\"\n\nThe sailors tried to row to shore but could not. Finally they threw Jonah into the sea. Immediately the storm stopped.\n\nBut Jonah did not drown. God had prepared a great big fish to swallow him!\n\nFor three days and three nights Jonah sat inside the fish. In the dark, he prayed and prayed.\n\nThen the fish spat Jonah out onto dry land. This time, Jonah went to Nineveh!","ref":"Jonah 1:1–2:10"},{"id":35,"part":5,"partName":"Kings and Prophets","title":"Daniel in the Lions' Den","emoji":"🦁","color":"#2a1a1a","imageQuery":"Daniel lions den prayer Bible children illustration","text":"Daniel was taken to Babylon as a young man when Jerusalem was destroyed. Even far from home, Daniel loved God with all his heart.\n\nDaniel grew up to become one of the wisest and most trusted men in all of Babylon. The king depended on him greatly.\n\nBut other officials were jealous of Daniel. They tried to find something wrong with him. They could find nothing — Daniel was completely honest and faithful.\n\nSo they tricked the king into making a law: for thirty days, no one could pray to any god or man except the king. Anyone who disobeyed would be thrown to the lions!\n\nDaniel heard about the new law. He went home, opened his window toward Jerusalem, and prayed to God — three times a day, just as he always had.\n\nThe jealous officials saw him and reported it to the king. Even though the king loved Daniel, he could not change the law.\n\nWith a heavy heart, the king had Daniel thrown into a pit full of hungry lions. \"May your God, whom you serve faithfully, rescue you!\" the king said sadly.\n\nThe king could not sleep all night. At dawn he ran to the lions' den and called out: \"Daniel! Has your God been able to rescue you?\"\n\nFrom inside the pit came Daniel's voice: \"O king, live forever! My God sent His angel to shut the lions' mouths! They have not hurt me — because I am innocent before God and before you.\"\n\nThe king pulled Daniel out. Not a scratch on him!\n\nWhen we are faithful to God, He is always faithful to us.","ref":"Daniel 6:1–28"},{"id":36,"part":6,"partName":"The Life of Jesus","title":"An Angel Visits Mary","emoji":"👼","color":"#1a1a3a","imageQuery":"Angel Gabriel Mary annunciation Bible children illustration","text":"After hundreds of years, the time had come for God's greatest promise to be fulfilled.\n\nIn the little town of Nazareth, there lived a young woman named Mary. She loved God deeply and tried every day to please Him.\n\nOne day, something astonishing happened. An angel named Gabriel appeared before her in a flash of light!\n\nMary was startled and afraid.\n\n\"Do not be afraid, Mary,\" the angel said warmly. \"God has chosen you especially! You are going to have a baby boy. You will name Him Jesus. He will be called the Son of God. He will be a King whose kingdom will never end!\"\n\nMary's eyes were wide. \"How can this be?\" she asked quietly. \"I am not yet married.\"\n\nThe angel explained that God's own Holy Spirit would make this happen. \"Nothing is impossible with God!\"\n\nMary was silent for a moment. Then she said the most beautiful words: \"I am God's servant. Let it happen to me just as you have said.\"\n\nMary ran to visit her older cousin Elizabeth, who was also expecting a baby. When Elizabeth heard Mary's greeting, the baby inside her leaped for joy!\n\n\"Blessed are you among all women!\" Elizabeth exclaimed.\n\nMary sang a beautiful song of praise to God — thanking Him for choosing her for this most wonderful and holy task.","ref":"Luke 1:26–56"},{"id":37,"part":6,"partName":"The Life of Jesus","title":"Jesus is Born","emoji":"⭐","color":"#0a1a2a","imageQuery":"Jesus born stable manger shepherds star Bethlehem children","text":"A great ruler named Caesar Augustus sent out a command. Everyone in the land had to go to their home city to be counted and registered.\n\nMary and Joseph had to travel to Bethlehem — the city of David — because Joseph was from the family of King David.\n\nThe journey was long and tiring. Mary was about to have her baby.\n\nWhen they arrived in Bethlehem, the town was packed with people who had also come to be registered. Every inn was full. There was no room anywhere!\n\nFinally, someone offered them a stable — a place where animals were kept. It was simple and humble. Not at all what you might expect for the birth of the Son of God.\n\nThat night, in that quiet stable, Mary had her baby boy. She wrapped Him in strips of cloth to keep Him warm and laid Him in a manger — a feeding box filled with soft hay.\n\nMeanwhile, in the fields outside Bethlehem, shepherds were watching their flocks in the dark night sky.\n\nSuddenly the sky blazed with light! An angel appeared and the shepherds were terrified.\n\n\"Do not be afraid!\" the angel said joyfully. \"I bring you wonderful news for all people! Today in the city of David, a Saviour has been born — Christ the Lord! You will find Him wrapped in cloth, lying in a manger.\"\n\nThen the whole sky filled with angels, singing: \"Glory to God in the highest! And peace on earth to those He loves!\"\n\nThe shepherds ran to find the baby. And there He was — exactly as the angel had said.","ref":"Luke 2:1–20"},{"id":38,"part":6,"partName":"The Life of Jesus","title":"The Wise Men Follow a Star","emoji":"🌟","color":"#1a1a2a","imageQuery":"Wise men star Bethlehem gifts Jesus Bible children illustration","text":"Far away in the East, wise men who studied the stars saw something extraordinary — a new, brilliant star blazing in the sky.\n\nThey knew what it meant. A great king had been born!\n\nThey packed their bags and their finest gifts and followed the star on a long, long journey.\n\nThe star led them to Jerusalem. They went to King Herod's palace, assuming a king would be born there.\n\n\"Where is the child who has been born King of the Jews?\" they asked. \"We saw His star in the East and have come to worship Him!\"\n\nKing Herod was very troubled. He called for the chief priests and asked where this special child was to be born. \"In Bethlehem,\" they said, quoting the ancient prophecy.\n\nHerod secretly told the wise men, \"Go and find the child. Then come back and tell me — so that I can worship him too.\" But wicked Herod was lying. He wanted to get rid of this new king!\n\nThe wise men followed the star until it stopped right over the very house where Jesus was.\n\nThey went in and saw the young child with His mother Mary. They knelt down and worshipped Him. They opened their treasure boxes and gave Him gifts of gold, frankincense, and myrrh.\n\nThen God warned them in a dream not to go back to Herod. So they returned home a different way.\n\nThe star of Bethlehem still shines in our hearts today.","ref":"Matthew 2:1–12"},{"id":39,"part":6,"partName":"The Life of Jesus","title":"Young Jesus in the Temple","emoji":"📖","color":"#2a2a1a","imageQuery":"Young Jesus temple teachers Jerusalem Bible children illustration","text":"Every year, Mary and Joseph travelled to Jerusalem for the great Passover feast. When Jesus was twelve years old, He went with them.\n\nAfter the feast was over, Mary and Joseph began the long journey home with a great crowd of family and friends.\n\nAt the end of the first day, Mary looked around. Where was Jesus?\n\nShe asked the relatives. No one had seen Him. She asked the friends. Nobody knew.\n\nMary and Joseph rushed back to Jerusalem, searching anxiously. They looked everywhere.\n\nFor three days they searched! Can you imagine how worried they were?\n\nFinally they found Him — in the Temple! He was sitting among the teachers, listening to them and asking them questions. And the great teachers of Israel were amazed at His understanding and His answers!\n\n\"Son!\" Mary said, her heart still pounding. \"Why did you do this to us? Your father and I have been looking for you everywhere, so worried!\"\n\nJesus answered gently, \"Why were you looking for me? Didn't you know I had to be in my Father's house?\"\n\nHe meant God's house. Even at twelve years old, Jesus knew exactly who He was and why He had come.\n\nThen Jesus went home with Mary and Joseph and was obedient to them. He grew taller and wiser, and God and people loved Him more and more.","ref":"Luke 2:41–52"},{"id":40,"part":6,"partName":"The Life of Jesus","title":"Jesus Feeds Five Thousand","emoji":"🐟","color":"#0a2a2a","imageQuery":"Jesus feeding five thousand loaves fishes miracle children","text":"Jesus was the most wonderful teacher who ever lived. Crowds of people followed Him everywhere to hear Him speak.\n\nOne day a huge crowd had been listening to Jesus all day long in a quiet place far from any town. There were five thousand men, plus women and children! An enormous crowd!\n\nAs evening came, the disciples came to Jesus. \"Send the people away so they can go to the villages and buy food for themselves.\"\n\n\"They don't need to go away,\" Jesus said. \"You give them something to eat!\"\n\nThe disciples looked at each other. \"But we only have five loaves of bread and two small fish! That's all there is!\"\n\nA small boy in the crowd had brought his lunch — those five loaves and two fish. He gave everything he had to Jesus.\n\nJesus told the crowds to sit down on the grass in groups. He took the five loaves and two fish, looked up to heaven, and thanked God. Then He began breaking the bread and fish apart and giving them to His disciples to hand out.\n\nAnd the food kept multiplying! Every hand was filled. Every person ate until they were full — all five thousand of them and more!\n\nWhen everyone had finished eating, the disciples collected the leftovers. Twelve full baskets!\n\nJesus had fed thousands of people with a small boy's lunch. Nothing is too hard for Jesus!","ref":"Matthew 14:13–21; John 6:1–14"},{"id":41,"part":6,"partName":"The Life of Jesus","title":"Jesus Loves the Children","emoji":"❤️","color":"#2a1a2a","imageQuery":"Jesus children blessing arms Bible illustration warm","text":"People loved to bring their little children to Jesus. They wanted Him to place His hands on them and pray a blessing over them.\n\nBut when some parents started bringing their children near, the disciples stepped in front. \"Go away!\" they said. \"Jesus is too busy for children. Don't bother him!\"\n\nWhen Jesus saw this, He was displeased.\n\n\"Let the little children come to me!\" Jesus said warmly. \"Do not stop them! The kingdom of heaven belongs to people just like these!\"\n\nAnd Jesus reached out His arms.\n\nThe children came running to Him — toddlers and bigger children, shy ones and bold ones. Jesus picked up the little ones and held them. He placed His hands gently on each child's head and prayed a blessing over them.\n\nJesus took time for every single child.\n\nThen Jesus said something wonderful. He told His disciples: \"Truly I tell you, unless you change and become like little children, you will never enter the kingdom of heaven. Whoever becomes humble like a little child is the greatest in the kingdom of heaven.\"\n\nJesus loves children. He thinks children are important — not just when they grow up, but right now, exactly as they are.\n\nHe loves YOU right now — just as you are. Exactly your age, exactly your size, exactly you.","ref":"Matthew 18:1–5; 19:13–15; Mark 10:13–16"},{"id":42,"part":6,"partName":"The Life of Jesus","title":"Jesus Heals the Sick","emoji":"🌿","color":"#1a3a1a","imageQuery":"Jesus healing sick blind man leper Bible children illustration","text":"Everywhere Jesus went, sick people came to Him. And Jesus never turned anyone away.\n\nA man covered in the terrible disease of leprosy knelt before Jesus. Lepers had to live away from everyone because the disease was catching. Nobody was allowed to touch a leper.\n\nBut the man had hope. \"Lord, if you are willing, you CAN make me clean!\"\n\nJesus reached out His hand and touched the man. In those days, no one ever touched a leper!\n\n\"I am willing,\" Jesus said. \"Be clean!\" Immediately the leprosy vanished!\n\nA blind man named Bartimaeus heard that Jesus was passing by. He called out, \"Jesus! Have mercy on me!\"\n\nPeople told him to be quiet. But he shouted even louder. Jesus stopped and called for him.\n\n\"What do you want me to do for you?\" Jesus asked.\n\n\"Teacher — I want to see!\"\n\n\"Go,\" said Jesus. \"Your faith has healed you.\" And immediately Bartimaeus could see for the first time. He followed Jesus down the road, full of joy!\n\nTen men with leprosy called out to Jesus from far away. He healed all ten of them. But only one came back to thank Him.\n\nJesus asked, \"Were not all ten healed? Where are the other nine?\"\n\nAlways remember to say thank you to God for what He has done for you.","ref":"Matthew 8:1–3; Mark 10:46–52; Luke 17:11–19"},{"id":43,"part":6,"partName":"The Life of Jesus","title":"The Story of the Lost Son","emoji":"🏡","color":"#3a2a1a","imageQuery":"Prodigal son father running embrace Bible children illustration","text":"Jesus told the most beautiful stories to help people understand what God is like. One day He told this story:\n\nA man had two sons. The younger son said to his father, \"Father, give me my share of everything now. I don't want to wait.\"\n\nThe father divided his wealth and gave it to him. The younger son took everything and went far away. He spent all his money on wild parties and silly things. Then a great famine came, and he had nothing.\n\nHe was so hungry that he got a job feeding pigs. He was so poor that he wanted to eat the pigs' food.\n\nThen he came to his senses. \"My father's servants have more than enough to eat. I will go home and say — Father, I have done wrong. I am not worthy to be called your son. Just make me like one of your servants.\"\n\nSo he started the long walk home.\n\nBut here is the most beautiful part:\n\nWhile the son was still far down the road, his father saw him coming. His heart leaped! He ran — ran! — toward his son. He threw his arms around him and kissed him.\n\n\"Father, I've sinned—\" the son began.\n\nBut the father called to his servants: \"Bring the best robe! Put a ring on his finger! Prepare a feast! My son was lost and is found. He was dead and is alive again!\"\n\nThat father is just like God. No matter how far we go, God is always watching for us to come home. And when we do — He runs to meet us.","ref":"Luke 15:11–32"},{"id":44,"part":6,"partName":"The Life of Jesus","title":"Jesus Calms the Storm","emoji":"⛵","color":"#0a1a2a","imageQuery":"Jesus calms storm sea waves disciples boat Bible children","text":"One evening, Jesus and His disciples got into a boat to cross the Sea of Galilee.\n\nJesus was very tired from a long day of teaching. He went to the back of the boat, put His head on a pillow, and fell fast asleep.\n\nWhile He slept, a fierce storm blew up. Waves crashed over the boat. The wind howled. Water was pouring in! The boat was about to sink!\n\nThe disciples were experienced fishermen — they knew how dangerous these storms were. They were terrified!\n\nThey shook Jesus awake. \"Teacher! Don't you care that we are going to drown?!\"\n\nJesus stood up in the rocking, water-soaked boat. He looked out at the howling waves.\n\nHe spoke to the storm. \"Quiet! Be still!\"\n\nThe wind stopped. The waves flattened. The sea became completely calm. Like a mirror.\n\nJesus turned to His disciples. \"Why are you so afraid? Do you still have no faith?\"\n\nThe disciples looked at each other with wide eyes. \"Who is this man?\" they whispered. \"Even the wind and the waves obey Him!\"\n\nDo you ever feel like you are in a storm? When things seem frightening and out of control, Jesus is right there with you in the boat.\n\nHe can speak to any storm in your life. He just says — Peace. Be still.","ref":"Mark 4:35–41"},{"id":45,"part":6,"partName":"The Life of Jesus","title":"Jesus Rises from the Dead","emoji":"🌅","color":"#1a2a3a","imageQuery":"Jesus resurrection empty tomb angel Easter Bible children","text":"Jesus was the kindest, most loving person who ever lived. He healed the sick. He fed the hungry. He loved children. He forgave sinners.\n\nBut some powerful men were jealous of Jesus. They hated how many people loved Him. They decided to have Him killed.\n\nJesus was arrested, put on trial, and nailed to a cross. It was the saddest day in all of history. Jesus died on that cross.\n\nHis body was placed in a tomb — a cave carved in rock. A great stone was rolled across the entrance.\n\nAll His friends were heartbroken. They thought everything was over.\n\nBut three days later — on Sunday morning — some women came to the tomb early, while it was still dark.\n\nThey found the great stone rolled away! They went inside and — the tomb was empty!\n\nSuddenly two angels appeared in dazzling white. \"Why do you look for the living among the dead?\" the angels said. \"He is not here — He has risen!\"\n\nThe women ran to tell the disciples. Then Jesus Himself appeared! Alive! Real! They touched His hands. He spoke to them. He ate with them.\n\nJesus had defeated death itself!\n\nThis is the best news in all the world. Jesus is alive. He is alive right now. And because He lives, we can live with Him forever.","ref":"Matthew 27:32–28:10; Luke 24:1–12"},{"id":46,"part":7,"partName":"The Early Church","title":"The Holy Spirit Comes","emoji":"🔥","color":"#2a1a1a","imageQuery":"Pentecost Holy Spirit fire disciples Bible children illustration","text":"Before Jesus went back to heaven, He made a wonderful promise to His disciples.\n\n\"Stay in Jerusalem and wait,\" He told them. \"My Father will send you a special helper — the Holy Spirit. And when the Holy Spirit comes upon you, you will receive power to tell everyone about me — here in Jerusalem, in all Judea and Samaria, and to the very ends of the earth!\"\n\nThen Jesus was lifted up into the sky and disappeared into a cloud. The disciples stood there looking up with their mouths open!\n\nTwo angels appeared. \"Why are you standing here looking at the sky? Jesus has gone to heaven. One day He will come back in the same way you saw Him go.\"\n\nThe disciples went back to Jerusalem and prayed together. About one hundred and twenty of them waited faithfully.\n\nTen days passed. Then came the Jewish festival called Pentecost. Suddenly a sound like a mighty rushing wind filled the whole house! What looked like tongues of fire appeared and rested on each person!\n\nAnd they all began to speak in different languages — languages they had never learned!\n\nOutside, Jerusalem was full of people from many countries. They heard the noise and came running. They were amazed to hear the disciples speaking in their own languages!\n\n\"What does this mean?\" they asked.\n\nPeter stood up and told the crowd about Jesus. That day, three thousand people believed and were baptised. The church of Jesus had begun!","ref":"Acts 1:4–2:41"},{"id":47,"part":7,"partName":"The Early Church","title":"Paul's Amazing Change","emoji":"💡","color":"#3a2a1a","imageQuery":"Paul Damascus road light conversion Bible children illustration","text":"There was a man named Saul who hated the followers of Jesus with a passion.\n\nSaul thought Christians were dangerous. He tracked them down, arrested them, and had them thrown in prison. He was even there watching when a man named Stephen was stoned to death — the very first person killed for following Jesus.\n\nSaul was so determined to stop the Christians that he got special letters from the high priest allowing him to go to the city of Damascus and arrest any Christians he found there.\n\nSaul set out on the road to Damascus, breathing fire and threats against the disciples of Jesus.\n\nBut then — a flash of light from heaven! It was brighter than the noon sun. Saul fell to the ground!\n\nA voice spoke: \"Saul! Saul! Why are you persecuting me?\"\n\n\"Who are you, Lord?\" Saul gasped.\n\n\"I am Jesus — the one you are persecuting!\"\n\nSaul was trembling. \"Lord, what do you want me to do?\"\n\n\"Get up and go into the city. You will be told what to do.\"\n\nSaul stood up — but he was blind! His companions led him by the hand into Damascus.\n\nFor three days, Saul sat blind, not eating or drinking, just praying.\n\nThen God sent a man named Ananias to pray for Saul. His sight returned! He was baptised immediately.\n\nThe man who had been the greatest enemy of the church became its greatest champion! He was renamed Paul, and he took the story of Jesus to the whole world.","ref":"Acts 9:1–22"},{"id":48,"part":8,"partName":"God's Great Promises","title":"A New World Coming","emoji":"🌍","color":"#1a2a3a","imageQuery":"New earth paradise garden children people God Bible illustration","text":"The Bible tells us that God has a wonderful plan for this earth. A truly wonderful plan.\n\nOne day, all the sadness in the world will be gone. No more sickness. No more death. No more crying. No more pain.\n\nDo you ever see something sad — an animal that is hurt, or someone who is sick, or someone crying? One day all of that will be fixed forever.\n\nGod says, \"I will make everything new!\"\n\nThe Bible describes this new world as paradise. Gardens filled with fruit and flowers. Clear rivers running through beautiful fields. Animals and people living in peace together — just like in the original Garden of Eden.\n\nLions and lambs lying down together. Children playing safely. No one afraid of anything.\n\nAnd best of all — God Himself will live with His people. No more separation between heaven and earth. God's home will be right here with us!\n\n\"He will wipe every tear from their eyes,\" the Bible promises. \"Death shall be no more. Grief and crying and pain will be no more.\"\n\nThe people who love God and follow Jesus will live in this beautiful world forever and ever.\n\nHow long is forever? Close your eyes and think of the biggest number you can imagine. Keep going. And going. Forever is longer than that!\n\nGod wants YOU to be part of His wonderful forever family. All you need to do is love Him and follow Jesus with all your heart.","ref":"Revelation 21:1–5; Isaiah 65:17–25"}];
+
+// Group by part
+var PARTS = {};
+STORIES.forEach(function(s) {
+  if (!PARTS[s.part]) PARTS[s.part] = { name: s.partName, stories: [] };
+  PARTS[s.part].stories.push(s);
+});
+
+var currentStoryIdx = 0;
+var isReadingAloud = false;
+var synth = window.speechSynthesis;
+var homeAudioPlaying = false;
+
+// ── SPLASH ──
+function buildSplashStars() {
+  var c = document.getElementById('splashStars');
+  for (var i = 0; i < 60; i++) {
+    var s = document.createElement('div');
+    s.className = 'splash-star';
+    var sz = Math.random() * 3 + 1;
+    s.style.cssText = 'width:'+sz+'px;height:'+sz+'px;left:'+Math.random()*100+'%;top:'+Math.random()*100+'%;--d:'+(2+Math.random()*4).toFixed(1)+'s;--dl:'+(Math.random()*4).toFixed(1)+'s;--op:'+(0.4+Math.random()*0.6).toFixed(2);
+    c.appendChild(s);
+  }
+}
+
+function enterKids() {
+  if (synth) synth.cancel();
+  document.getElementById('splash').classList.add('fade-out');
+  setTimeout(function() { document.getElementById('splash').style.display = 'none'; }, 550);
+  buildHome();
+  setTimeout(playWelcome, 700);
+}
+
+// ── WELCOME AUDIO ──
+function getKidsVoice() {
+  var voices = synth ? synth.getVoices() : [];
+  var preferred = ['Samantha', 'Karen', 'Moira', 'Tessa', 'Victoria', 'Allison'];
+  for (var i = 0; i < preferred.length; i++) {
+    for (var j = 0; j < voices.length; j++) {
+      if (voices[j].name.indexOf(preferred[i]) >= 0) return voices[j];
+    }
+  }
+  for (var j = 0; j < voices.length; j++) {
+    if (voices[j].lang && voices[j].lang.indexOf('en') === 0) return voices[j];
+  }
+  return voices[0] || null;
+}
+
+function speakKids(text, onEnd, rate) {
+  if (!synth) { if (onEnd) onEnd(); return; }
+  synth.cancel();
+  var utt = new SpeechSynthesisUtterance(text);
+  utt.rate = rate || 0.88;
+  utt.pitch = 1.1;
+  utt.volume = 1.0;
+  var voice = getKidsVoice();
+  if (voice) utt.voice = voice;
+  utt.onend = onEnd || null;
+  utt.onerror = function() { if (onEnd) onEnd(); };
+  synth.speak(utt);
+}
+
+function playWelcome() {
+  speakKids(
+    "Welcome to Bible Stories for Children! " +
+    "Here you will find 48 amazing true stories from the Bible. " +
+    "Stories about creation and floods, brave heroes and wise kings, " +
+    "and the wonderful life of Jesus! " +
+    "Tap any story to begin!",
+    function() { homeAudioPlaying = false; updateTopBtn(); },
+    0.88
+  );
+  homeAudioPlaying = true;
+  updateTopBtn();
+}
+
+function toggleHomeAudio() {
+  if (homeAudioPlaying && synth && synth.speaking) {
+    synth.cancel();
+    homeAudioPlaying = false;
+    updateTopBtn();
+  } else {
+    playWelcome();
+  }
+}
+
+function updateTopBtn() {
+  var btn = document.getElementById('topAudioBtn');
+  if (btn) {
+    btn.textContent = homeAudioPlaying ? '⏸ Stop' : '🔊 Welcome';
+    btn.className = homeAudioPlaying ? 'audio-btn playing' : 'audio-btn';
+  }
+}
+
+// ── HOME ──
+var openParts = {};
+
+function buildHome() {
+  var list = document.getElementById('partsList');
+  list.innerHTML = '';
+  Object.keys(PARTS).forEach(function(p) {
+    var part = PARTS[p];
+    var section = document.createElement('div');
+    section.className = 'part-section';
+
+    var header = document.createElement('div');
+    header.className = 'part-header';
+    header.innerHTML =
+      '<div class="part-num">' + p + '</div>' +
+      '<div class="part-name">' + part.name + '</div>' +
+      '<div class="part-count">' + part.stories.length + ' stories</div>' +
+      '<div class="part-arrow">›</div>';
+
+    var grid = document.createElement('div');
+    grid.className = 'story-grid';
+    grid.id = 'part-grid-' + p;
+
+    part.stories.forEach(function(story, idx) {
+      var tile = document.createElement('div');
+      tile.className = 'story-tile';
+      tile.style.background = story.color;
+      tile.innerHTML =
+        '<div class="tile-emoji">' + story.emoji + '</div>' +
+        '<div class="tile-num">Story ' + story.id + '</div>' +
+        '<div class="tile-title">' + story.title + '</div>';
+      tile.onclick = (function(s) { return function() { openStory(s); }; })(story);
+      grid.appendChild(tile);
+    });
+
+    header.onclick = function() {
+      var isOpen = grid.classList.contains('open');
+      if (isOpen) {
+        grid.classList.remove('open');
+        header.classList.remove('open');
+      } else {
+        grid.classList.add('open');
+        header.classList.add('open');
+      }
+    };
+
+    section.appendChild(header);
+    section.appendChild(grid);
+    list.appendChild(section);
+  });
+
+  // Auto-open Part 1
+  var firstGrid = document.getElementById('part-grid-1');
+  if (firstGrid) {
+    firstGrid.classList.add('open');
+    var firstHeader = firstGrid.previousSibling;
+    if (firstHeader) firstHeader.classList.add('open');
+  }
+}
+
+// ── STORY READER ──
+function openStory(story) {
+  if (synth) synth.cancel();
+  homeAudioPlaying = false;
+  updateTopBtn();
+
+  currentStoryIdx = STORIES.indexOf(story);
+  renderReader();
+  document.getElementById('reader').classList.add('active');
+}
+
+function closeReader() {
+  if (synth) synth.cancel();
+  isReadingAloud = false;
+  updateReadBtn();
+  document.getElementById('reader').classList.remove('active');
+}
+
+function renderReader() {
+  var story = STORIES[currentStoryIdx];
+  if (!story) return;
+
+  var total = STORIES.length;
+  document.getElementById('readerTitle').textContent = story.emoji + ' ' + story.title;
+  document.getElementById('readerProg').textContent = story.id + ' / ' + total;
+  document.getElementById('readerProgFill').style.width = Math.round((story.id/total)*100) + '%';
+  document.getElementById('storyImageTitle').textContent = story.title;
+  document.getElementById('storyImageEmoji').textContent = story.emoji;
+  document.getElementById('storyEmoji').textContent = story.emoji;
+  document.getElementById('storyRef').textContent = story.ref;
+
+  // Render text paragraphs
+  var paragraphs = story.text.split('\n\n').filter(function(p) { return p.trim(); });
+  document.getElementById('storyText').innerHTML = paragraphs.map(function(p) {
+    return '<p>' + p.trim() + '</p>';
+  }).join('');
+
+  // Load illustration via image search
+  loadStoryImage(story);
+
+  // Update background colour
+  document.getElementById('reader').style.background = story.color;
+
+  // Scroll to top
+  document.getElementById('readerBody').scrollTop = 0;
+
+  // Auto read aloud
+  if (isReadingAloud) {
+    setTimeout(function() { startReadAloud(story); }, 500);
+  }
+}
+
+function loadStoryImage(story) {
+  var wrap = document.getElementById('storyImageWrap');
+  var placeholder = document.getElementById('imgPlaceholder');
+
+  var IMAGE_URLS = {
+    1: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4d/Michelangelo%2C_Sistine_Chapel_ceiling%2C_God_separating_light_from_darkness.jpg/800px-Michelangelo%2C_Sistine_Chapel_ceiling%2C_God_separating_light_from_darkness.jpg",
+    2: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8b/Wenzel_Peter_-_Adam_und_Eva_im_Paradies.jpg/800px-Wenzel_Peter_-_Adam_und_Eva_im_Paradies.jpg",
+    3: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ae/Cranach_Adam_and_Eve_1526.jpg/500px-Cranach_Adam_and_Eve_1526.jpg",
+    4: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Massaccio%2C_cacciata_dal_paradiso_terrestre%2C_1425_ca.jpg/400px-Massaccio%2C_cacciata_dal_paradiso_terrestre%2C_1425_ca.jpg",
+    5: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Munkacsy_-_Adam_es_Eva.jpg/800px-Munkacsy_-_Adam_es_Eva.jpg",
+    6: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Rubens_Cain_slaying_Abel.jpg/534px-Rubens_Cain_slaying_Abel.jpg",
+    7: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/English_School_-_Enoch_Translated_-_B1977.14.11_-_Yale_Center_for_British_Art.jpg/648px-English_School_-_Enoch_Translated_-_B1977.14.11_-_Yale_Center_for_British_Art.jpg",
+    8: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Gustave_Dore_-_The_Giants_%28Book_of_Enoch%29.jpg/533px-Gustave_Dore_-_The_Giants_%28Book_of_Enoch%29.jpg",
+    9: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/Noahs_Ark.jpg/800px-Noahs_Ark.jpg",
+    10: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/John_Everett_Millais_-_The_Return_of_the_Dove_to_the_Ark.jpg/640px-John_Everett_Millais_-_The_Return_of_the_Dove_to_the_Ark.jpg",
+    11: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Noahs_Ark_and_the_Rainbow%2C_by_Joseph_Anton_Koch.jpg/800px-Noahs_Ark_and_the_Rainbow%2C_by_Joseph_Anton_Koch.jpg",
+    12: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Pieter_Brueghel_the_Elder_-_The_Tower_of_Babel_%28Vienna%29_-_Google_Art_Project_-_edited.jpg/800px-Pieter_Brueghel_the_Elder_-_The_Tower_of_Babel_%28Vienna%29_-_Google_Art_Project_-_edited.jpg",
+    13: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Jozef_Israels_-_Abraham%27s_Journey.jpg/800px-Jozef_Israels_-_Abraham%27s_Journey.jpg",
+    14: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/58/Sacrifice_of_Isaac-Caravaggio_%28Uffizi%29.jpg/800px-Sacrifice_of_Isaac-Caravaggio_%28Uffizi%29.jpg",
+    15: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/db/Destruction_of_Sodom_and_Gomorrah%2C_John_Martin.jpg/800px-Destruction_of_Sodom_and_Gomorrah%2C_John_Martin.jpg",
+        16: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/27/Esau_Sells_His_Birthright.jpg/800px-Esau_Sells_His_Birthright.jpg",
+    17: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Giambattista_Tiepolo_-_Joseph_Receiving_Potiphar%27s_Wife%27s_Accusation.jpg/800px-Giambattista_Tiepolo_-_Joseph_Receiving_Potiphar%27s_Wife%27s_Accusation.jpg",
+    18: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Gustave_Dore_Joseph_Recognized_By_His_Brothers.jpg/533px-Gustave_Dore_Joseph_Recognized_By_His_Brothers.jpg",
+        19: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Pharaoh_Dreams_Poynter.jpg/613px-Pharaoh_Dreams_Poynter.jpg",
+    20: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/Gustave_Dore_-_Joseph_Makes_Himself_Known_to_His_Brothers.jpg/533px-Gustave_Dore_-_Joseph_Makes_Himself_Known_to_His_Brothers.jpg",
+    21: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Moses_saved_from_the_waters.jpg/800px-Moses_saved_from_the_waters.jpg",
+    22: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ab/Domenico_Feti_-_Moses_before_the_Burning_Bush.jpg/592px-Domenico_Feti_-_Moses_before_the_Burning_Bush.jpg",
+    23: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f8/The_Seventh_Plague%2C_by_John_Martin.jpg/800px-The_Seventh_Plague%2C_by_John_Martin.jpg",
+    24: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/Tissot_The_Passover.jpg/800px-Tissot_The_Passover.jpg",
+    25: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/62/The_Crossing_of_the_Red_Sea%2C_by_Frederick_Arthur_Bridgman.jpg/800px-The_Crossing_of_the_Red_Sea%2C_by_Frederick_Arthur_Bridgman.jpg",
+    26: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/Gathering_of_the_Manna_Ercole_de%27_Roberti.jpg/800px-Gathering_of_the_Manna_Ercole_de%27_Roberti.jpg",
+        27: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/Rembrandt_Harmensz._van_Rijn_079.jpg/800px-Rembrandt_Harmensz._van_Rijn_079.jpg",
+    28: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/de/Golden_calf_3_detail.jpg/540px-Golden_calf_3_detail.jpg",
+    29: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Caleb_and_Joshua_with_the_grapes_of_Canaan%2C_colored_engraving_by_H._Pisan.jpg/571px-Caleb_and_Joshua_with_the_grapes_of_Canaan%2C_colored_engraving_by_H._Pisan.jpg",
+        30: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/16/Jericho.jpg/800px-Jericho.jpg",
+    31: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/58/David_and_Goliath_-_Osmar_Schindler_%281888%29.jpg/800px-David_and_Goliath_-_Osmar_Schindler_%281888%29.jpg",
+        32: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Tissot_King_Solomon.jpg/541px-Tissot_King_Solomon.jpg",
+    33: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Washington_Allston_-_Elijah_in_the_Desert_-_Google_Art_Project.jpg/800px-Washington_Allston_-_Elijah_in_the_Desert_-_Google_Art_Project.jpg",
+    34: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/df/Jonah_and_the_Whale%2C_Folio_from_a_Jami_al-Tavarikh.jpg/541px-Jonah_and_the_Whale%2C_Folio_from_a_Jami_al-Tavarikh.jpg",
+    35: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/Briton_Rivi%C3%A8re_-_Daniel_in_the_Lions%27_Den.jpg/800px-Briton_Rivi%C3%A8re_-_Daniel_in_the_Lions%27_Den.jpg",
+    36: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Henry_Ossawa_Tanner_-_The_Annunciation.jpg/800px-Henry_Ossawa_Tanner_-_The_Annunciation.jpg",
+    37: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Adoration_shepherds_reni.jpg/800px-Adoration_shepherds_reni.jpg",
+    38: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f2/Nativity_04.jpg/640px-Nativity_04.jpg",
+    39: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Ingres_Jesus_among_the_doctors.jpg/800px-Ingres_Jesus_among_the_doctors.jpg",
+    40: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Feeding_the_Multitude_%28color%29.jpg/800px-Feeding_the_Multitude_%28color%29.jpg",
+    41: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/58/Bloch-suffer_the_little_children.jpg/800px-Bloch-suffer_the_little_children.jpg",
+    42: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/09/Carl_Heinrich_Bloch_-_Jesus_Healing_the_Sick_at_Bethesda.jpg/800px-Carl_Heinrich_Bloch_-_Jesus_Healing_the_Sick_at_Bethesda.jpg",
+    43: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/Return_of_the_Prodigal_Son_by_Pompeo_Batoni.jpg/608px-Return_of_the_Prodigal_Son_by_Pompeo_Batoni.jpg",
+    44: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/Christ_in_the_Storm_on_the_Sea_of_Galilee.jpg/800px-Christ_in_the_Storm_on_the_Sea_of_Galilee.jpg",
+    45: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Carl_Heinrich_Bloch_-_The_Resurrection.jpg/800px-Carl_Heinrich_Bloch_-_The_Resurrection.jpg",
+    46: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Jean_II_Restout_-_Pentec%C3%B4te.jpg/578px-Jean_II_Restout_-_Pentec%C3%B4te.jpg",
+    47: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/Conversion_of_Paul_Schnorr_von_Carolsfeld.png/533px-Conversion_of_Paul_Schnorr_von_Carolsfeld.png",
+    48: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fb/Thomas_Cole_-_The_Garden_of_Eden_-_Amon_Carter_Museum.jpg/800px-Thomas_Cole_-_The_Garden_of_Eden_-_Amon_Carter_Museum.jpg",
+  };
+
+  var imgUrl = IMAGE_URLS[story.id];
+  if (!imgUrl) {
+    placeholder.style.display = 'flex';
+    return;
+  }
+
+  var img = wrap.querySelector('img');
+  if (!img) {
+    img = document.createElement('img');
+    img.alt = story.title;
+    wrap.insertBefore(img, placeholder);
+  }
+
+  placeholder.style.display = 'flex';
+  img.style.display = 'none';
+  document.getElementById('imgPlaceholder').querySelector('.img-placeholder-text').textContent = 'Loading illustration...';
+
+  img.onload = function() {
+    placeholder.style.display = 'none';
+    img.style.display = 'block';
+  };
+  img.onerror = function() {
+    placeholder.style.display = 'flex';
+    var pt = document.getElementById('imgPlaceholderText'); if(pt) pt.textContent = story.title; document.getElementById('storyEmoji').textContent = story.emoji;
+    img.style.display = 'none';
+  };
+  img.src = imgUrl;
+}
+
+function nextStory() {
+  if (synth) synth.cancel();
+  if (currentStoryIdx < STORIES.length - 1) {
+    currentStoryIdx++;
+    renderReader();
+  } else {
+    closeReader();
+  }
+}
+
+function prevStory() {
+  if (synth) synth.cancel();
+  if (currentStoryIdx > 0) {
+    currentStoryIdx--;
+    renderReader();
+  }
+}
+
+// ── READ ALOUD ──
+function toggleReadAloud() {
+  if (isReadingAloud && synth && synth.speaking) {
+    synth.cancel();
+    isReadingAloud = false;
+    updateReadBtn();
+  } else {
+    isReadingAloud = true;
+    updateReadBtn();
+    startReadAloud(STORIES[currentStoryIdx]);
+  }
+}
+
+function startReadAloud(story) {
+  if (!synth || !isReadingAloud) return;
+  var fullText = story.title + '. ' + story.text.replace(/\n\n/g, '. ') + '. From ' + story.ref + '.';
+  speakKids(fullText, function() {
+    isReadingAloud = false;
+    updateReadBtn();
+  }, 0.86);
+}
+
+function updateReadBtn() {
+  var btn = document.getElementById('readAloudBtn');
+  if (btn) {
+    btn.textContent = isReadingAloud ? '⏸ Stop' : '🔊 Read';
+    btn.className = isReadingAloud ? 'sf-read-btn reading' : 'sf-read-btn';
+  }
+}
+
+// ── INIT ──
+buildSplashStars();
+if (synth && synth.onvoiceschanged !== undefined) {
+  synth.onvoiceschanged = function() {};
+}
+</script>
+</body>
+</html>
