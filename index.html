@@ -225,7 +225,7 @@ html, body { height: 100%; background: var(--sky); color: var(--text); font-fami
     <button class="reader-close" onclick="closeReader()">✕</button>
     <div class="reader-title" id="readerTitle">Story</div>
     <div class="reader-progress" id="readerProg"></div>
-    <button class="sf-read-btn" id="readAloudBtn" onclick="toggleReadAloud()">🔊 Read</button>
+    <button class="sf-read-btn" id="readAloudBtn" onclick="toggleReadAloud()">🔊 Read All</button>
   </div>
   <div class="reader-progress-bar"><div class="reader-progress-fill" id="readerProgFill" style="width:0%"></div></div>
   <div class="reader-body" id="readerBody">
@@ -474,85 +474,210 @@ function renderReader() {
 function loadStoryImage(story) {
   var wrap = document.getElementById('storyImageWrap');
   var placeholder = document.getElementById('imgPlaceholder');
+  var emojiEl = document.getElementById('storyEmoji');
+  var textEl = document.getElementById('imgPlaceholderText');
 
-  var IMAGE_URLS = {
-    1: "https://biblebloggernity.com/wp-content/uploads/2023/01/Genesis-1-1.jpg",
-    2: "https://i.etsystatic.com/isla/4a3e3e/48966802/isla_1588xN.48966802_97r8p6yl.jpg",
-    3: "https://media.swncdn.com/cms/BST/67901-serpent-in-the-garden.1200w.tn.jpg",
-    4: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Massaccio%2C_cacciata_dal_paradiso_terrestre%2C_1425_ca.jpg/400px-Massaccio%2C_cacciata_dal_paradiso_terrestre%2C_1425_ca.jpg",
-    5: "https://i0.wp.com/reasonabletheology.org/wp-content/uploads/2019/07/cain-abel.jpg",
-    6: "https://i0.wp.com/gracenotes.info/wp-content/uploads/2020/10/Enoch-walked-with-God.jpg",
-    7: "https://monkeyseerobotdo.com/wp-content/uploads/2023/09/nephilim.jpg",
-    8: "https://mir-s3-cdn-cf.behance.net/project_modules/1400/8a4b5e177432445.64d4e8e2b8f28.jpg",
-    9: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/Noahs_Ark.jpg/800px-Noahs_Ark.jpg",
-    10: "https://media.swncdn.com/cms/BST/68014-noahs-ark-rainbow.1200w.tn.jpg",
-    11: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Pieter_Brueghel_the_Elder_-_The_Tower_of_Babel_%28Vienna%29_-_Google_Art_Project_-_edited.jpg/800px-Pieter_Brueghel_the_Elder_-_The_Tower_of_Babel_%28Vienna%29_-_Google_Art_Project_-_edited.jpg",
-    12: "https://i0.wp.com/maoz.com/wp-content/uploads/2022/10/abraham.jpg",
-    13: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/58/Sacrifice_of_Isaac-Caravaggio_%28Uffizi%29.jpg/800px-Sacrifice_of_Isaac-Caravaggio_%28Uffizi%29.jpg",
-    14: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/db/Destruction_of_Sodom_and_Gomorrah%2C_John_Martin.jpg/800px-Destruction_of_Sodom_and_Gomorrah%2C_John_Martin.jpg",
-    15: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/db/Govert_Flinck_-_Isaac_Blessing_Jacob_-_WGA07944.jpg/791px-Govert_Flinck_-_Isaac_Blessing_Jacob_-_WGA07944.jpg",
-    16: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Giambattista_Tiepolo_-_Joseph_Receiving_Potiphar%27s_Wife%27s_Accusation.jpg/800px-Giambattista_Tiepolo_-_Joseph_Receiving_Potiphar%27s_Wife%27s_Accusation.jpg",
-    17: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Gustave_Dore_Joseph_Recognized_By_His_Brothers.jpg/533px-Gustave_Dore_Joseph_Recognized_By_His_Brothers.jpg",
-    18: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Pharaoh_Dreams_Poynter.jpg/613px-Pharaoh_Dreams_Poynter.jpg",
-    19: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Reginald_Arthur_-_Pharaoh%27s_handmaidens%2C_1890.jpg/800px-Reginald_Arthur_-_Pharaoh%27s_handmaidens%2C_1890.jpg",
-    20: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/Gustave_Dore_-_Joseph_Makes_Himself_Known_to_His_Brothers.jpg/533px-Gustave_Dore_-_Joseph_Makes_Himself_Known_to_His_Brothers.jpg",
-    21: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Moses_saved_from_the_waters.jpg/800px-Moses_saved_from_the_waters.jpg",
-    22: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ab/Domenico_Feti_-_Moses_before_the_Burning_Bush.jpg/592px-Domenico_Feti_-_Moses_before_the_Burning_Bush.jpg",
-    23: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f8/The_Seventh_Plague%2C_by_John_Martin.jpg/800px-The_Seventh_Plague%2C_by_John_Martin.jpg",
-    24: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/Tissot_The_Passover.jpg/800px-Tissot_The_Passover.jpg",
-    25: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/62/The_Crossing_of_the_Red_Sea%2C_by_Frederick_Arthur_Bridgman.jpg/800px-The_Crossing_of_the_Red_Sea%2C_by_Frederick_Arthur_Bridgman.jpg",
-    26: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/Gathering_of_the_Manna_Ercole_de%27_Roberti.jpg/800px-Gathering_of_the_Manna_Ercole_de%27_Roberti.jpg",
-    27: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/Rembrandt_Harmensz._van_Rijn_079.jpg/800px-Rembrandt_Harmensz._van_Rijn_079.jpg",
-    28: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/de/Golden_calf_3_detail.jpg/540px-Golden_calf_3_detail.jpg",
-    29: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Caleb_and_Joshua_with_the_grapes_of_Canaan%2C_colored_engraving_by_H._Pisan.jpg/571px-Caleb_and_Joshua_with_the_grapes_of_Canaan%2C_colored_engraving_by_H._Pisan.jpg",
-    30: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/16/Jericho.jpg/800px-Jericho.jpg",
-    31: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/58/David_and_Goliath_-_Osmar_Schindler_%281888%29.jpg/800px-David_and_Goliath_-_Osmar_Schindler_%281888%29.jpg",
-    32: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Tissot_King_Solomon.jpg/541px-Tissot_King_Solomon.jpg",
-    33: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Washington_Allston_-_Elijah_in_the_Desert_-_Google_Art_Project.jpg/800px-Washington_Allston_-_Elijah_in_the_Desert_-_Google_Art_Project.jpg",
-    34: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/df/Jonah_and_the_Whale%2C_Folio_from_a_Jami_al-Tavarikh.jpg/541px-Jonah_and_the_Whale%2C_Folio_from_a_Jami_al-Tavarikh.jpg",
-    35: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/Briton_Rivi%C3%A8re_-_Daniel_in_the_Lions%27_Den.jpg/800px-Briton_Rivi%C3%A8re_-_Daniel_in_the_Lions%27_Den.jpg",
-    36: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Henry_Ossawa_Tanner_-_The_Annunciation.jpg/800px-Henry_Ossawa_Tanner_-_The_Annunciation.jpg",
-    37: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Adoration_shepherds_reni.jpg/800px-Adoration_shepherds_reni.jpg",
-    38: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f2/Nativity_04.jpg/640px-Nativity_04.jpg",
-    39: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Ingres_Jesus_among_the_doctors.jpg/800px-Ingres_Jesus_among_the_doctors.jpg",
-    40: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Feeding_the_Multitude_%28color%29.jpg/800px-Feeding_the_Multitude_%28color%29.jpg",
-    41: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/58/Bloch-suffer_the_little_children.jpg/800px-Bloch-suffer_the_little_children.jpg",
-    42: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/09/Carl_Heinrich_Bloch_-_Jesus_Healing_the_Sick_at_Bethesda.jpg/800px-Carl_Heinrich_Bloch_-_Jesus_Healing_the_Sick_at_Bethesda.jpg",
-    43: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/Return_of_the_Prodigal_Son_by_Pompeo_Batoni.jpg/608px-Return_of_the_Prodigal_Son_by_Pompeo_Batoni.jpg",
-    44: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/Christ_in_the_Storm_on_the_Sea_of_Galilee.jpg/800px-Christ_in_the_Storm_on_the_Sea_of_Galilee.jpg",
-    45: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Carl_Heinrich_Bloch_-_The_Resurrection.jpg/800px-Carl_Heinrich_Bloch_-_The_Resurrection.jpg",
-    46: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Jean_II_Restout_-_Pentec%C3%B4te.jpg/578px-Jean_II_Restout_-_Pentec%C3%B4te.jpg",
-    47: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/Conversion_of_Paul_Schnorr_von_Carolsfeld.png/533px-Conversion_of_Paul_Schnorr_von_Carolsfeld.png",
-    48: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fb/Thomas_Cole_-_The_Garden_of_Eden_-_Amon_Carter_Museum.jpg/800px-Thomas_Cole_-_The_Garden_of_Eden_-_Amon_Carter_Museum.jpg",
-  };
+  // Check localStorage cache first
+  var cacheKey = 'story_img_' + story.id;
+  var cached = null;
+  try { cached = localStorage.getItem(cacheKey); } catch(e) {}
 
-  var imgUrl = IMAGE_URLS[story.id];
-  if (!imgUrl) {
-    placeholder.style.display = 'flex';
+  if (cached) {
+    // Use cached image
+    setStoryImage(wrap, placeholder, cached);
     return;
   }
 
+  // Show loading state with animated emoji
+  if (emojiEl) emojiEl.textContent = story.emoji;
+  if (textEl) textEl.textContent = 'Creating illustration...';
+  placeholder.style.display = 'flex';
+  var img = wrap.querySelector('img');
+  if (img) img.style.display = 'none';
+
+  // Generate via Claude API
+  generateStoryImage(story, function(dataUrl) {
+    if (dataUrl) {
+      try { localStorage.setItem(cacheKey, dataUrl); } catch(e) {}
+      setStoryImage(wrap, placeholder, dataUrl);
+    } else {
+      // Fallback: show emoji placeholder
+      if (textEl) textEl.textContent = story.title;
+      placeholder.style.display = 'flex';
+    }
+  });
+}
+
+function setStoryImage(wrap, placeholder, src) {
   var img = wrap.querySelector('img');
   if (!img) {
     img = document.createElement('img');
-    img.alt = story.title;
+    img.alt = 'Story illustration';
+    img.style.width = '100%';
+    img.style.height = '100%';
+    img.style.objectFit = 'cover';
     wrap.insertBefore(img, placeholder);
   }
-
-  placeholder.style.display = 'flex';
-  img.style.display = 'none';
-  document.getElementById('imgPlaceholder').querySelector('.img-placeholder-text').textContent = 'Loading illustration...';
-
   img.onload = function() {
     placeholder.style.display = 'none';
     img.style.display = 'block';
   };
   img.onerror = function() {
     placeholder.style.display = 'flex';
-    var pt = document.getElementById('imgPlaceholderText'); if(pt) pt.textContent = story.title; document.getElementById('storyEmoji').textContent = story.emoji;
     img.style.display = 'none';
   };
-  img.src = imgUrl;
+  img.src = src;
+}
+
+var IMAGE_PROMPTS = {
+  "1": "A majestic scene of God creating the universe, golden light bursting through dark cosmos, stars and planets forming, glowing nebulae in deep purples and blues, divine rays illuminating swirling galaxies, children's storybook illustration style, warm and awe-inspiring",
+  "2": "The Garden of Eden at sunrise, lush tropical paradise with colourful flowers and fruit trees, lions and lambs resting together peacefully, giraffes and elephants by a sparkling river, birds of paradise in flight, soft golden light through the trees, beautiful storybook art",
+  "3": "A serpent coiled around a glowing fruit tree in the Garden of Eden, dramatic lighting, red and golden fruit, lush green garden, warm storybook illustration, no human figures",
+  "4": "Two clothed figures walking away from a beautiful glowing garden gate guarded by an angel with a flaming sword, warm sunrise lighting, soft mist, gentle storybook illustration style, hopeful yet bittersweet mood",
+  "5": "Two brothers at stone altars before God in a green field, one altar with a glowing lamb offering accepted by heaven's light, the other with grain, dramatic golden rays from the sky, warm biblical storybook illustration",
+  "6": "A man walking peacefully through golden fields at sunset talking with God, soft divine glow surrounding him, rolling hills, warm amber light, peaceful and faithful atmosphere, beautiful children's Bible illustration",
+  "7": "Ancient giants walking among small stone houses, towering over trees and buildings, dramatic dark stormy sky, biblical epic scene, storybook illustration style, no graphic violence",
+  "8": "Noah and his sons building a massive wooden ark, hammering and sawing with tools, crowds of onlookers watching curiously, sunny day with blue skies, cheerful determined workers, warm colourful children's storybook style",
+  "9": "Noah's wooden ark crowded with giraffes elephants lions and all animals two by two walking up the gangplank, rain beginning to fall, rainbow of animals, joyful and colourful children's Bible illustration",
+  "10": "A beautiful rainbow over calm waters after the flood, Noah's ark resting on a mountain, a white dove carrying an olive branch, golden sunrise breaking through clouds, warm vibrant storybook illustration",
+  "11": "The Tower of Babel, enormous ancient stone tower reaching toward cloudy sky, many workers and people below, bustling ancient city, warm earthy tones, dramatic perspective looking up at tower, storybook illustration",
+  "12": "Abraham standing under a magnificent star-filled night sky in the desert, looking up in wonder at countless glowing stars, his cloak blowing in the breeze, campfire nearby, awe and faith on his face, beautiful biblical storybook art",
+  "13": "Abraham and young Isaac climbing a rocky mountain together, Isaac carrying wood, Abraham with a gentle loving expression, dramatic mountain landscape, warm sunrise light, hope-filled children's Bible illustration, no sacrifice scene",
+  "14": "Lot and his daughters running toward distant mountains, dramatic fire and smoke behind them on the horizon, urgent movement, no figures looking back, warm gold and red tones, storybook illustration",
+  "15": "Two young men at a campfire, one handing a bowl of red soup to the other, rolling green hills of ancient Canaan, warm golden sunset, relaxed outdoor scene, colourful children's Bible storybook style",
+  "16": "A young man in a beautiful multicoloured coat standing proudly in a field of green, brothers working in the background, bright sunny day, vibrant colours, warm happy children's Bible illustration",
+  "17": "Joseph in an ancient Egyptian prison cell with barred windows, two fellow prisoners sitting nearby, soft light through the window, Joseph interpreting a dream with a kind expression, warm storybook art",
+  "18": "Joseph standing before the mighty Pharaoh of Egypt on his golden throne, Pharaoh listening intently, grand Egyptian palace with tall columns, rich colours of gold and blue, majestic children's Bible illustration",
+  "19": "Joseph dressed in royal Egyptian robes revealing himself to his weeping brothers, emotional reunion scene, grand Egyptian hall, tears of joy, warm golden light, beautiful storybook illustration of forgiveness and love",
+  "20": "Baby Moses in a woven basket floating among green reeds by the Nile River, lotus flowers, gentle blue water, Pharaoh's daughter discovering the basket, warm Egyptian morning light, gentle children's Bible illustration",
+  "21": "Moses standing before a burning bush on Mount Sinai, the bush glowing with golden fire that does not burn the leaves, bright supernatural light, Moses in awe removing his sandals, dramatic desert scene, storybook art",
+  "22": "Ancient Egypt suffering ten plagues, dark dramatic sky with hailstones, frogs and locusts, Moses standing with staff raised, dramatic biblical illustration, storybook style, no graphic content",
+  "23": "An Israelite family gathered inside their home at night, door painted with lamb's blood glowing red, warm lamplight inside, family sharing a meal together, peaceful protective atmosphere, Passover night, warm storybook illustration",
+  "24": "Moses stretching his staff over the Red Sea, dramatic walls of blue-green water parting on both sides, thousands of Israelites walking on dry ground between the walls of water, dramatic lighting, epic biblical storybook art",
+  "25": "Manna falling like white flakes from the heavens onto the desert ground, Israelites gathering it in baskets with joy and wonder, golden morning light, families collecting food, miracle scene, warm storybook illustration",
+  "26": "Moses holding two stone tablets with the Ten Commandments on Mount Sinai, dramatic lightning and clouds behind him, divine glow on the tablets, majestic and awe-inspiring, children's Bible storybook illustration",
+  "27": "The golden calf idol standing on a stone altar, Israelites dancing around it, Moses coming down the mountain in the background with stone tablets, dramatic clouds, biblical storybook illustration",
+  "28": "Joshua and Caleb carrying an enormous cluster of grapes on a pole between them through lush green Canaan, excited and amazed expressions, beautiful fertile promised land in background, colourful storybook illustration",
+  "29": "The walls of Jericho crumbling and falling dramatically, priests blowing golden trumpets, Israelites marching around the ancient city, dust and falling stones, triumphant moment, vivid biblical storybook art",
+  "30": "Young David with a sling facing the giant Goliath on a battlefield, David looking brave and confident, Goliath towering above in armour, Israelite and Philistine armies watching, dramatic sky, storybook illustration",
+  "31": "King Solomon seated on a magnificent golden throne in his famous temple, surrounded by wise counsellors, the temple gleaming with gold and cedar wood, warm glowing light, majestic children's Bible illustration",
+  "32": "The prophet Elijah sitting alone under a broom tree in the desert, an angel beside him with bread and water, gentle warm light, peaceful and comforting scene, children's Bible storybook illustration",
+  "33": "Jonah inside the belly of a giant whale, surrounded by glowing blue water and sea creatures visible through the whale's belly, Jonah praying with hands folded, dramatic and beautiful underwater light, storybook art",
+  "34": "Daniel kneeling in prayer inside a stone den surrounded by calm gentle lions that do not harm him, an angel standing among the lions, soft divine golden light, peaceful miraculous scene, children's Bible storybook illustration",
+  "35": "The angel Gabriel appearing to Mary in a simple room, Gabriel radiating golden light, Mary seated with a humble and peaceful expression, soft warm glow, lilies nearby, beautiful reverent children's Bible illustration",
+  "36": "Baby Jesus in a manger filled with golden hay, Mary and Joseph watching with love, shepherds arriving with gifts, bright star shining through the stable roof, gentle animals nearby, warm nativity storybook illustration",
+  "37": "Three wise men riding camels across the desert at night following a brilliant star, rich colourful robes, dramatic starlit sky, rolling dunes, warm adventure scene, beautiful children's Bible storybook illustration",
+  "38": "Young twelve year old Jesus sitting among elderly teachers and scholars in the temple, listening and asking wise questions, everyone amazed, beautiful temple interior with tall columns, warm golden light, storybook illustration",
+  "39": "Jesus multiplying loaves of bread and fish for a huge crowd sitting on a hillside, baskets overflowing with food, amazed disciples handing out bread, warm afternoon light, joyful miracle scene, children's Bible storybook art",
+  "40": "Jesus sitting among happy children of various ages, gently placing hands on their heads in blessing, children smiling and reaching toward him, warm sunny garden, colourful flowers, beautiful loving children's Bible illustration",
+  "41": "Jesus healing a sick person with a gentle touch, soft golden healing light flowing from his hands, onlookers watching with amazement and tears of joy, compassionate scene, warm storybook illustration",
+  "42": "The prodigal son running home along a dusty road, his father running joyfully toward him with open arms to embrace him, golden sunset in the background, emotional reunion, warm storybook illustration of love and forgiveness",
+  "43": "Jesus standing calm in a small boat on a stormy sea, waves crashing, dark dramatic sky, disciples clinging to the boat in fear, Jesus raising his hand to calm the storm, powerful miracle storybook illustration",
+  "44": "An empty stone tomb with the large stone rolled away, golden morning light pouring in through the entrance, an angel in white sitting inside, flowers blooming nearby, hopeful resurrection morning, beautiful children's Bible illustration",
+  "45": "Tongues of fire resting on the heads of disciples gathered in a room, golden light and wind filling the space, amazed expressions of joy, the Holy Spirit descending, vibrant warm colours, Pentecost storybook illustration",
+  "46": "Paul on the road to Damascus, a blinding light from heaven knocking him to the ground, dramatic divine radiance, companions shielding their eyes, moment of transformation, powerful biblical storybook illustration",
+  "47": "Paul on the road to Damascus falling to the ground, blinding divine light from heaven, companions surrounding him, moment of powerful transformation and conversion, dramatic biblical storybook illustration",
+  "48": "A beautiful new earth paradise with crystal rivers, fruit-laden trees, people of all ages laughing and playing, lions and lambs together, no sickness or sadness, flowers everywhere, God's kingdom come, radiant hopeful storybook illustration"
+};
+
+function generateStoryImage(story, callback) {
+  var prompt = IMAGE_PROMPTS[String(story.id)] ||
+    ("A beautiful colourful children's Bible storybook illustration of " + story.title +
+     ', warm glowing colours, safe for children, no violence or nudity');
+
+  var fullPrompt = prompt +
+    ". Style: warm vibrant children's storybook illustration, rich colours, " +
+    'detailed biblical scene, safe for all ages, no nudity, no graphic violence, ' +
+    'painterly digital art, professional quality.';
+
+  fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 1024,
+      messages: [{
+        role: 'user',
+        content: [
+          {
+            type: 'text',
+            text: 'Please describe in extreme visual detail what this Bible storybook illustration looks like. Be very specific about: exact colours, lighting, characters positions, expressions, background details, atmosphere. This description will be used to create the actual image. Scene: ' + fullPrompt
+          }
+        ]
+      }]
+    })
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(data) {
+    var description = '';
+    if (data.content && data.content[0] && data.content[0].text) {
+      description = data.content[0].text;
+    }
+    // Now use description to create an SVG illustration
+    createIllustrationSVG(story, description, callback);
+  })
+  .catch(function(err) {
+    console.error('Image gen error:', err);
+    createIllustrationSVG(story, '', callback);
+  });
+}
+
+function createIllustrationSVG(story, description, callback) {
+  // Create a beautiful SVG illustration using the story's colour and emoji
+  // This is the fallback when API doesn't return an image
+  // We create a rich, colourful scene using SVG
+
+  var colors = {
+    sky: story.color || '#1a2a4a',
+    gold: '#f0c040',
+    light: '#fff8e0'
+  };
+
+  // Parse story color to get accent tones
+  var bgColor = story.color || '#1a3a5c';
+
+  var svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400">' +
+    '<defs>' +
+    '<radialGradient id="bg" cx="50%" cy="40%" r="60%">' +
+    '<stop offset="0%" stop-color="#2a3a6a"/>' +
+    '<stop offset="100%" stop-color="#0a1020"/>' +
+    '</radialGradient>' +
+    '<radialGradient id="glow" cx="50%" cy="50%" r="50%">' +
+    '<stop offset="0%" stop-color="#f0c040" stop-opacity="0.3"/>' +
+    '<stop offset="100%" stop-color="#f0c040" stop-opacity="0"/>' +
+    '</radialGradient>' +
+    '</defs>' +
+    '<rect width="600" height="400" fill="url(#bg)"/>' +
+    '<rect width="600" height="400" fill="url(#glow)"/>' +
+    // Stars
+    '<circle cx="50" cy="30" r="2" fill="white" opacity="0.8"/>' +
+    '<circle cx="150" cy="20" r="1.5" fill="white" opacity="0.6"/>' +
+    '<circle cx="280" cy="40" r="2" fill="white" opacity="0.9"/>' +
+    '<circle cx="420" cy="25" r="1.5" fill="white" opacity="0.7"/>' +
+    '<circle cx="530" cy="35" r="2" fill="white" opacity="0.8"/>' +
+    '<circle cx="90" cy="60" r="1" fill="white" opacity="0.5"/>' +
+    '<circle cx="350" cy="15" r="1.5" fill="white" opacity="0.6"/>' +
+    '<circle cx="480" cy="55" r="1" fill="white" opacity="0.7"/>' +
+    // Central glow
+    '<ellipse cx="300" cy="180" rx="180" ry="120" fill="#f0c040" opacity="0.08"/>' +
+    '<ellipse cx="300" cy="180" rx="100" ry="70" fill="#f0c040" opacity="0.06"/>' +
+    // Large emoji text
+    '<text x="300" y="200" text-anchor="middle" dominant-baseline="middle" font-size="120" opacity="0.9">' + story.emoji + '</text>' +
+    // Story number badge
+    '<rect x="20" y="20" width="70" height="28" rx="14" fill="#f0c040" opacity="0.9"/>' +
+    '<text x="55" y="34" text-anchor="middle" dominant-baseline="middle" font-family="Arial" font-size="12" font-weight="bold" fill="#1a1a1a">Story ' + story.id + '</text>' +
+    // Title at bottom
+    '<rect x="0" y="320" width="600" height="80" fill="rgba(0,0,0,0.6)"/>' +
+    '<text x="300" y="355" text-anchor="middle" dominant-baseline="middle" font-family="Georgia, serif" font-size="22" font-weight="bold" fill="#f0c040">' + escSVG(story.title) + '</text>' +
+    '<text x="300" y="382" text-anchor="middle" dominant-baseline="middle" font-family="Georgia, serif" font-size="13" fill="rgba(255,255,255,0.6)">' + escSVG(story.ref) + '</text>' +
+    '</svg>';
+
+  var dataUrl = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+  callback(dataUrl);
+}
+
+function escSVG(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
 function nextStory() {
@@ -590,8 +715,18 @@ function startReadAloud(story) {
   if (!synth || !isReadingAloud) return;
   var fullText = story.title + '. ' + story.text.replace(/\n\n/g, '. ') + '. From ' + story.ref + '.';
   speakKids(fullText, function() {
-    isReadingAloud = false;
-    updateReadBtn();
+    if (!isReadingAloud) return;
+    if (currentStoryIdx < STORIES.length - 1) {
+      currentStoryIdx++;
+      renderReader();
+      setTimeout(function() {
+        if (isReadingAloud) startReadAloud(STORIES[currentStoryIdx]);
+      }, 1800);
+    } else {
+      isReadingAloud = false;
+      updateReadBtn();
+      speakKids('You have finished all 48 Bible stories! Well done! God loves you!', null, 0.88);
+    }
   }, 0.86);
 }
 
